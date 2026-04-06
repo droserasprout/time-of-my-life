@@ -5,3 +5,4 @@ local.properties
 *.iml
 app/release/
 .superpowers/
+*.hprof
