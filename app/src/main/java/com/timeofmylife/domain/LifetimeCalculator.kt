@@ -20,12 +20,12 @@ object LifetimeCalculator {
     )
 
     private val SCENARIOS = listOf(
-        ScenarioDef(setOf(Reliability.HIGH), false, "H / bad"),
-        ScenarioDef(setOf(Reliability.HIGH), true, "H / good"),
-        ScenarioDef(setOf(Reliability.HIGH, Reliability.MEDIUM), false, "HM / bad"),
-        ScenarioDef(setOf(Reliability.HIGH, Reliability.MEDIUM), true, "HM / good"),
-        ScenarioDef(setOf(Reliability.HIGH, Reliability.MEDIUM, Reliability.LOW), false, "HML / bad"),
-        ScenarioDef(setOf(Reliability.HIGH, Reliability.MEDIUM, Reliability.LOW), true, "HML / good"),
+        ScenarioDef(setOf(Reliability.HIGH), false, "high / worst"),
+        ScenarioDef(setOf(Reliability.HIGH), true, "high / best"),
+        ScenarioDef(setOf(Reliability.HIGH, Reliability.MEDIUM), false, "medium / worst"),
+        ScenarioDef(setOf(Reliability.HIGH, Reliability.MEDIUM), true, "medium / best"),
+        ScenarioDef(setOf(Reliability.HIGH, Reliability.MEDIUM, Reliability.LOW), false, "low / worst"),
+        ScenarioDef(setOf(Reliability.HIGH, Reliability.MEDIUM, Reliability.LOW), true, "low / best"),
     )
 
     fun calculate(balances: List<Balance>, budgetItems: List<BudgetItem>): List<LifetimeRow> =

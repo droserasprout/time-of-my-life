@@ -123,12 +123,12 @@ private fun TotalsCard(
             Row(modifier = Modifier.fillMaxWidth()) {
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    "good", style = MaterialTheme.typography.labelSmall,
+                    "best", style = MaterialTheme.typography.labelSmall,
                     color = IncomeGreen, textAlign = TextAlign.End,
                     modifier = Modifier.width(AMOUNT_COL_WIDTH)
                 )
                 Text(
-                    "bad", style = MaterialTheme.typography.labelSmall,
+                    "worst", style = MaterialTheme.typography.labelSmall,
                     color = ExpenseRed, textAlign = TextAlign.End,
                     modifier = Modifier.width(AMOUNT_COL_WIDTH)
                 )
@@ -268,8 +268,8 @@ private fun BudgetItemRow(
                         )
                     }
                     Column(horizontalAlignment = Alignment.End) {
-                        Text("good \$${item.goodAmount.toLong()}", style = MaterialTheme.typography.bodySmall, color = IncomeGreen)
-                        Text("bad \$${item.badAmount.toLong()}", style = MaterialTheme.typography.bodySmall, color = ExpenseRed)
+                        Text("best \$${item.goodAmount.toLong()}", style = MaterialTheme.typography.bodySmall, color = IncomeGreen)
+                        Text("worst \$${item.badAmount.toLong()}", style = MaterialTheme.typography.bodySmall, color = ExpenseRed)
                     }
                 }
             }

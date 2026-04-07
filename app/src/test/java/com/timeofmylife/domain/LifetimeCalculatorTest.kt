@@ -68,11 +68,11 @@ class LifetimeCalculatorTest {
     @Test
     fun `row labels are correct`() {
         val rows = LifetimeCalculator.calculate(balances, budgetItems)
-        assertEquals("H / bad", rows[0].label)
-        assertEquals("H / good", rows[1].label)
-        assertEquals("HM / bad", rows[2].label)
-        assertEquals("HM / good", rows[3].label)
-        assertEquals("HML / bad", rows[4].label)
-        assertEquals("HML / good", rows[5].label)
+        assertEquals("high / worst", rows[0].label)
+        assertEquals("high / best", rows[1].label)
+        assertEquals("medium / worst", rows[2].label)
+        assertEquals("medium / best", rows[3].label)
+        assertEquals("low / worst", rows[4].label)
+        assertEquals("low / best", rows[5].label)
     }
 }

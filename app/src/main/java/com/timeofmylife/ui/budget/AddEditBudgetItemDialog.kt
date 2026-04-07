@@ -46,7 +46,7 @@ fun AddEditBudgetItemDialog(
                 OutlinedTextField(
                     value = goodText,
                     onValueChange = { goodText = it },
-                    label = { Text("Good amount (USD)") },
+                    label = { Text("Best amount (USD)") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true
@@ -54,7 +54,7 @@ fun AddEditBudgetItemDialog(
                 OutlinedTextField(
                     value = badText,
                     onValueChange = { badText = it },
-                    label = { Text("Bad amount (USD)") },
+                    label = { Text("Worst amount (USD)") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true
