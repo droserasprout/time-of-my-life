@@ -7,13 +7,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -24,7 +25,8 @@ import com.timeofmylife.ui.theme.ExpenseRed
 import com.timeofmylife.ui.theme.IncomeGreen
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
+private val AMOUNT_COL_WIDTH = 68.dp
+
 @Composable
 fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     val vm: BudgetViewModel = viewModel(factory = BudgetViewModel.Factory(repository))
@@ -39,42 +41,47 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     val incomeBad = remember(items) { items.filter { it.type == ItemType.INCOME }.sumOf { it.badAmount } }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            contentPadding = PaddingValues(
-                top = innerPadding.calculateTopPadding() + 8.dp,
-                bottom = innerPadding.calculateBottomPadding() + 80.dp,
-                start = 16.dp, end = 16.dp
-            ),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            stickyHeader {
-                Surface(color = MaterialTheme.colorScheme.background) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = if (sortOrder == SortOrder.ALPHA) "A–Z" else "Size",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        IconButton(onClick = { vm.toggleSort() }) {
-                            Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = "Toggle sort order")
-                        }
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Sort row — outside LazyColumn to avoid stickyHeader overhead
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        top = innerPadding.calculateTopPadding() + 4.dp,
+                        start = 16.dp, end = 4.dp
+                    ),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (sortOrder == SortOrder.ALPHA) "A–Z" else "Size",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                IconButton(onClick = { vm.toggleSort() }) {
+                    Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = "Toggle sort order")
+                }
+            }
+
+            LazyColumn(
+                contentPadding = PaddingValues(
+                    bottom = innerPadding.calculateBottomPadding() + 80.dp,
+                    start = 16.dp, end = 16.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(items, key = { it.id }) { item ->
+                    BudgetItemRow(item = item, onEdit = { editTarget = item }, onDelete = { vm.delete(item) })
+                }
+                if (items.isNotEmpty()) {
+                    item {
+                        TotalsCard(expenseGood, expenseBad, incomeGood, incomeBad)
                     }
                 }
             }
-            items(items, key = { it.id }) { item ->
-                BudgetItemRow(item = item, onEdit = { editTarget = item }, onDelete = { vm.delete(item) })
-            }
-            if (items.isNotEmpty()) {
-                item {
-                    TotalsCard(expenseGood, expenseBad, incomeGood, incomeBad)
-                }
-            }
         }
+
         FloatingActionButton(
             onClick = { showAddDialog = true },
             modifier = Modifier
@@ -112,42 +119,62 @@ private fun TotalsCard(
     val netBad = incomeBad - expenseBad
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
+            // Header row aligning amount columns
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    "good", style = MaterialTheme.typography.labelSmall,
+                    color = IncomeGreen, textAlign = TextAlign.End,
+                    modifier = Modifier.width(AMOUNT_COL_WIDTH)
+                )
+                Text(
+                    "bad", style = MaterialTheme.typography.labelSmall,
+                    color = ExpenseRed, textAlign = TextAlign.End,
+                    modifier = Modifier.width(AMOUNT_COL_WIDTH)
+                )
+            }
             TotalsRow("Expenses", expenseGood, expenseBad, ExpenseRed)
             TotalsRow("Income", incomeGood, incomeBad, IncomeGreen)
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Net", style = MaterialTheme.typography.bodyMedium)
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(
-                        "good ${formatAmount(netGood)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (netGood >= 0) IncomeGreen else ExpenseRed
-                    )
-                    Text(
-                        "bad ${formatAmount(netBad)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (netBad >= 0) IncomeGreen else ExpenseRed
-                    )
-                }
-            }
+            TotalsRow(
+                label = "Net",
+                good = netGood,
+                bad = netBad,
+                labelColor = MaterialTheme.colorScheme.onSurface,
+                goodColor = if (netGood >= 0) IncomeGreen else ExpenseRed,
+                badColor = if (netBad >= 0) IncomeGreen else ExpenseRed
+            )
         }
     }
 }
 
 @Composable
-private fun TotalsRow(label: String, good: Double, bad: Double, color: androidx.compose.ui.graphics.Color) {
+private fun TotalsRow(
+    label: String,
+    good: Double,
+    bad: Double,
+    labelColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface,
+    goodColor: androidx.compose.ui.graphics.Color = IncomeGreen,
+    badColor: androidx.compose.ui.graphics.Color = ExpenseRed,
+) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(label, style = MaterialTheme.typography.bodyMedium, color = color)
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("good \$${good.toLong()}", style = MaterialTheme.typography.bodySmall, color = IncomeGreen)
-            Text("bad \$${bad.toLong()}", style = MaterialTheme.typography.bodySmall, color = ExpenseRed)
-        }
+        Text(
+            label, style = MaterialTheme.typography.bodyMedium,
+            color = labelColor, modifier = Modifier.weight(1f)
+        )
+        Text(
+            formatAmount(good), style = MaterialTheme.typography.bodySmall,
+            color = goodColor, textAlign = TextAlign.End,
+            modifier = Modifier.width(AMOUNT_COL_WIDTH)
+        )
+        Text(
+            formatAmount(bad), style = MaterialTheme.typography.bodySmall,
+            color = badColor, textAlign = TextAlign.End,
+            modifier = Modifier.width(AMOUNT_COL_WIDTH)
+        )
     }
 }
 
@@ -170,6 +197,13 @@ private fun BudgetItemRow(
         }
     )
 
+    // Snap back any item that was restored in swiped state (e.g. after navigation)
+    LaunchedEffect(dismissState.currentValue) {
+        if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart && !pendingDelete) {
+            dismissState.snapTo(SwipeToDismissBoxValue.Settled)
+        }
+    }
+
     if (pendingDelete) {
         AlertDialog(
             onDismissRequest = {
@@ -191,6 +225,7 @@ private fun BudgetItemRow(
 
     SwipeToDismissBox(
         state = dismissState,
+        enableDismissFromStartToEnd = false,
         backgroundContent = {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
                 Icon(
