@@ -22,27 +22,17 @@ import com.timeofmylife.data.model.ItemType
 import com.timeofmylife.ui.theme.ExpenseRed
 import com.timeofmylife.ui.theme.IncomeGreen
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     val vm: BudgetViewModel = viewModel(factory = BudgetViewModel.Factory(repository))
     val items by vm.items.collectAsStateWithLifecycle()
-
     var showAddDialog by remember { mutableStateOf(false) }
     var editTarget by remember { mutableStateOf<BudgetItem?>(null) }
 
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Budget") }) },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { showAddDialog = true }) {
-                Icon(Icons.Default.Add, contentDescription = "Add budget item")
-            }
-        },
-        contentWindowInsets = WindowInsets(0)
-    ) { scaffoldPadding ->
+    Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             contentPadding = PaddingValues(
-                top = scaffoldPadding.calculateTopPadding(),
+                top = innerPadding.calculateTopPadding() + 8.dp,
                 bottom = innerPadding.calculateBottomPadding() + 80.dp,
                 start = 16.dp, end = 16.dp
             ),
@@ -50,12 +40,16 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
             modifier = Modifier.fillMaxSize()
         ) {
             items(items, key = { it.id }) { item ->
-                BudgetItemRow(
-                    item = item,
-                    onEdit = { editTarget = item },
-                    onDelete = { vm.delete(item) }
-                )
+                BudgetItemRow(item = item, onEdit = { editTarget = item }, onDelete = { vm.delete(item) })
             }
+        }
+        FloatingActionButton(
+            onClick = { showAddDialog = true },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 16.dp, bottom = innerPadding.calculateBottomPadding() + 16.dp)
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Add budget item")
         }
     }
 

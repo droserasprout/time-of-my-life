@@ -4,7 +4,10 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -21,24 +24,19 @@ import com.timeofmylife.ui.theme.NegativeText
 
 private val COLUMNS = listOf("Scenario", "1m", "3m", "6m", "12m", "left")
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     val vm: LifetimeViewModel = viewModel(factory = LifetimeViewModel.Factory(repository))
     val rows by vm.rows.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Life Time") }) },
-        contentWindowInsets = WindowInsets(0)
-    ) { scaffoldPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = scaffoldPadding.calculateTopPadding(), bottom = innerPadding.calculateBottomPadding())
-                .horizontalScroll(rememberScrollState())
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-        ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = innerPadding.calculateTopPadding(), bottom = innerPadding.calculateBottomPadding())
+            .horizontalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp)
+    ) {
             // Header row
             Row {
                 COLUMNS.forEachIndexed { i, col ->
@@ -52,7 +50,6 @@ fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                 HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
             }
         }
-    }
 }
 
 @Composable

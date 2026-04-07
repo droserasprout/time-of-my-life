@@ -26,14 +26,23 @@ sealed class Screen(val route: String, val label: String, val icon: ImageVector)
 
 private val screens = listOf(Screen.Balances, Screen.Budget, Screen.Lifetime)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavigation(repository: FinanceRepository) {
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    val title = screens.firstOrNull { it.route == currentRoute }?.label ?: "Time of My Life"
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(title) },
+                actions = { ImportExportMenu(repository) }
+            )
+        },
         bottomBar = {
             NavigationBar {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
                 screens.forEach { screen ->
                     NavigationBarItem(

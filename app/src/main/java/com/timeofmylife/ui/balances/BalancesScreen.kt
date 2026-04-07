@@ -22,27 +22,18 @@ import com.timeofmylife.ui.theme.HighColor
 import com.timeofmylife.ui.theme.LowColor
 import com.timeofmylife.ui.theme.MediumColor
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BalancesScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     val vm: BalancesViewModel = viewModel(factory = BalancesViewModel.Factory(repository))
     val grouped by vm.grouped.collectAsStateWithLifecycle()
-
     var showAddDialog by remember { mutableStateOf(false) }
     var editTarget by remember { mutableStateOf<Balance?>(null) }
 
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Balances") }) },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { showAddDialog = true }) {
-                Icon(Icons.Default.Add, contentDescription = "Add balance")
-            }
-        },
-        contentWindowInsets = WindowInsets(0)
-    ) { scaffoldPadding ->
+    Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             contentPadding = PaddingValues(
-                top = scaffoldPadding.calculateTopPadding(),
+                top = innerPadding.calculateTopPadding() + 8.dp,
                 bottom = innerPadding.calculateBottomPadding() + 80.dp,
                 start = 16.dp, end = 16.dp
             ),
@@ -64,36 +55,30 @@ fun BalancesScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                                 Reliability.LOW -> LowColor
                             },
                             style = MaterialTheme.typography.labelLarge,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                         )
                     }
                 }
                 items(items, key = { it.id }) { balance ->
-                    BalanceItem(
-                        balance = balance,
-                        onEdit = { editTarget = balance },
-                        onDelete = { vm.delete(balance) }
-                    )
+                    BalanceItem(balance = balance, onEdit = { editTarget = balance }, onDelete = { vm.delete(balance) })
                 }
             }
+        }
+        FloatingActionButton(
+            onClick = { showAddDialog = true },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 16.dp, bottom = innerPadding.calculateBottomPadding() + 16.dp)
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Add balance")
         }
     }
 
     if (showAddDialog) {
-        AddEditBalanceDialog(
-            initial = null,
-            onConfirm = { vm.upsert(it); showAddDialog = false },
-            onDismiss = { showAddDialog = false }
-        )
+        AddEditBalanceDialog(null, onConfirm = { vm.upsert(it); showAddDialog = false }, onDismiss = { showAddDialog = false })
     }
     editTarget?.let { target ->
-        AddEditBalanceDialog(
-            initial = target,
-            onConfirm = { vm.upsert(it); editTarget = null },
-            onDismiss = { editTarget = null }
-        )
+        AddEditBalanceDialog(target, onConfirm = { vm.upsert(it); editTarget = null }, onDismiss = { editTarget = null })
     }
 }
 
