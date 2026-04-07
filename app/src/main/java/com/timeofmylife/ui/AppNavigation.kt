@@ -3,6 +3,7 @@ package com.timeofmylife.ui
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,30 +18,23 @@ import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.ui.balances.BalancesScreen
 import com.timeofmylife.ui.budget.BudgetScreen
 import com.timeofmylife.ui.lifetime.LifetimeScreen
+import com.timeofmylife.ui.settings.SettingsScreen
 
 sealed class Screen(val route: String, val label: String, val icon: ImageVector) {
     object Balances : Screen("balances", "Balances", Icons.Default.AccountBalance)
     object Budget : Screen("budget", "Budget", Icons.Default.AttachMoney)
     object Lifetime : Screen("lifetime", "Life Time", Icons.Default.Timeline)
+    object Settings : Screen("settings", "Settings", Icons.Default.Settings)
 }
 
-private val screens = listOf(Screen.Balances, Screen.Budget, Screen.Lifetime)
+private val screens = listOf(Screen.Balances, Screen.Budget, Screen.Lifetime, Screen.Settings)
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavigation(repository: FinanceRepository) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-    val title = screens.firstOrNull { it.route == currentRoute }?.label ?: "Time of My Life"
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(title) },
-                actions = { ImportExportMenu(repository) }
-            )
-        },
         bottomBar = {
             NavigationBar {
                 val currentDestination = navBackStackEntry?.destination
@@ -65,6 +59,7 @@ fun AppNavigation(repository: FinanceRepository) {
             composable(Screen.Balances.route) { BalancesScreen(repository, innerPadding) }
             composable(Screen.Budget.route) { BudgetScreen(repository, innerPadding) }
             composable(Screen.Lifetime.route) { LifetimeScreen(repository, innerPadding) }
+            composable(Screen.Settings.route) { SettingsScreen(repository, innerPadding) }
         }
     }
 }

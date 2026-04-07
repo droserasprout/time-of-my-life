@@ -30,4 +30,14 @@ class FinanceRepository(
         data.balances.forEach { balanceDao.upsert(it.toEntity()) }
         data.budgetItems.forEach { budgetItemDao.upsert(it.toEntity()) }
     }
+
+    suspend fun getAllBalances(): List<Balance> = balanceDao.getAll()
+    suspend fun getAllBudgetItems(): List<BudgetItem> = budgetItemDao.getAll()
+
+    suspend fun importRaw(balances: List<Balance>, budgetItems: List<BudgetItem>) {
+        balanceDao.deleteAll()
+        budgetItemDao.deleteAll()
+        balances.forEach { balanceDao.upsert(it) }
+        budgetItems.forEach { budgetItemDao.upsert(it) }
+    }
 }
