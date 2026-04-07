@@ -10,7 +10,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -26,8 +25,8 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 private val BALANCE_COLUMNS = listOf("Scenario", "1m", "3m", "6m", "12m")
-private val SURVIVAL_COLUMNS = listOf("Scenario", "Months", "Days", "Final Day")
-private val FINAL_DAY_FMT = DateTimeFormatter.ofPattern("MMM yyyy")
+private val SURVIVAL_COLUMNS = listOf("Scenario", "Time left", "Final Day")
+private val FINAL_DAY_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
 @Composable
 fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
@@ -40,7 +39,7 @@ fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
             .padding(top = innerPadding.calculateTopPadding(), bottom = innerPadding.calculateBottomPadding())
             .verticalScroll(rememberScrollState())
     ) {
-        // Balance matrix table
+        // Balance matrix table (horizontal scroll for narrow screens)
         Column(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(16.dp)) {
             Row {
                 BALANCE_COLUMNS.forEachIndexed { i, col ->
@@ -56,12 +55,12 @@ fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Survival table
-        Column(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
-            Row {
-                SURVIVAL_COLUMNS.forEachIndexed { i, col ->
-                    HeaderCell(col, survivalColWidth(i))
-                }
+        // Survival table — full width, no horizontal scroll
+        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                SurvivalHeaderCell(SURVIVAL_COLUMNS[0], isLabel = true)
+                SurvivalHeaderCell(SURVIVAL_COLUMNS[1])
+                SurvivalHeaderCell(SURVIVAL_COLUMNS[2])
             }
             HorizontalDivider()
             rows.forEachIndexed { index, row ->
@@ -74,10 +73,17 @@ fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     }
 }
 
-private fun survivalColWidth(index: Int): Dp = when (index) {
-    0 -> 120.dp
-    3 -> 90.dp
-    else -> 70.dp
+@Composable
+private fun RowScope.SurvivalHeaderCell(text: String, isLabel: Boolean = false) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+        textAlign = if (isLabel) TextAlign.Start else TextAlign.End,
+        modifier = Modifier
+            .weight(1f)
+            .padding(vertical = 6.dp, horizontal = 4.dp)
+    )
 }
 
 @Composable
@@ -109,19 +115,35 @@ private fun BalanceRow(row: LifetimeRow, background: Color) {
 @Composable
 private fun SurvivalRow(row: LifetimeRow, background: Color) {
     val months = row.monthsLeft
-    val days = if (months.isInfinite()) Double.POSITIVE_INFINITY else months * 30.44
-    val finalDay = when {
-        months.isInfinite() -> "∞"
-        else -> LocalDate.now().plusDays(days.toLong()).format(FINAL_DAY_FMT)
+    val totalDays = if (months.isInfinite()) Long.MAX_VALUE else (months * 30.44).toLong()
+    val timeLeft = if (months.isInfinite()) "∞" else {
+        val m = totalDays / 30
+        val d = totalDays % 30
+        if (m > 0) "${m}m ${d}d" else "${d}d"
     }
-    Surface(color = background) {
-        Row(modifier = Modifier.padding(vertical = 2.dp)) {
-            Cell(row.label, 120.dp, isLabel = true)
-            Cell(formatMonths(months), 70.dp)
-            Cell(formatDays(days), 70.dp)
-            Cell(finalDay, 90.dp)
+    val finalDay = if (months.isInfinite()) "∞" else
+        LocalDate.now().plusDays(totalDays).format(FINAL_DAY_FMT)
+
+    Surface(color = background, modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
+            SurvivalCell(row.label, isLabel = true)
+            SurvivalCell(timeLeft)
+            SurvivalCell(finalDay)
         }
     }
+}
+
+@Composable
+private fun RowScope.SurvivalCell(text: String, isLabel: Boolean = false) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurface,
+        textAlign = if (isLabel) TextAlign.Start else TextAlign.End,
+        modifier = Modifier
+            .weight(1f)
+            .padding(vertical = 8.dp, horizontal = 4.dp)
+    )
 }
 
 @Composable
@@ -130,10 +152,7 @@ private fun Cell(text: String, width: Dp, isLabel: Boolean = false) {
     Text(
         text = text,
         style = MaterialTheme.typography.bodySmall,
-        color = when {
-            isNegative -> NegativeText
-            else -> MaterialTheme.colorScheme.onSurface
-        },
+        color = if (isNegative) NegativeText else MaterialTheme.colorScheme.onSurface,
         textAlign = if (isLabel) TextAlign.Start else TextAlign.End,
         modifier = Modifier
             .width(width)
@@ -143,9 +162,3 @@ private fun Cell(text: String, width: Dp, isLabel: Boolean = false) {
 
 private fun formatBalance(amount: Double): String =
     if (amount >= 0) "\$${amount.toLong()}" else "-\$${(-amount).toLong()}"
-
-private fun formatMonths(months: Double): String =
-    if (months.isInfinite()) "∞" else months.toLong().toString()
-
-private fun formatDays(days: Double): String =
-    if (days.isInfinite()) "∞" else days.toLong().toString()
