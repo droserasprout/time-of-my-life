@@ -4,15 +4,20 @@ Android app that answers one question: **how long can you live on your current s
 
 Enter your balances and monthly budget, and the app computes how many months (and the exact final date) your money lasts across six scenarios — from your most reliable assets with an optimistic budget to everything you own in the worst case.
 
+Swipe between all four screens or use the bottom navigation bar.
+
 ## Screens
 
 ### Balances
-Your assets, grouped by reliability: **High** (e.g. bank account), **Medium** (e.g. brokerage), **Low** (e.g. crypto). Swipe left to delete, long-press to edit.
+
+Your assets, grouped by reliability: **High** (e.g. bank account), **Medium** (e.g. brokerage), **Low** (e.g. crypto). Tap to quick-edit the amount; use the edit icon for full details. Swipe left to delete.
 
 ### Budget
-Monthly expenses and incomes. Each item has a **best** amount (optimistic scenario) and a **worst** amount (pessimistic). Totals and net are pinned at the top. Sort A–Z or by size. Swipe left to delete with confirmation.
+
+Monthly expenses and incomes. Each item has three amounts: **best** (optimistic), **last** (last month actual), and **worst** (pessimistic). Totals and net are pinned at the top with a tick bar showing where last month landed. Sort A–Z or by size. Tap to edit; delete from the edit dialog.
 
 ### Life Time
+
 Two tables:
 
 **Balance matrix** — how much money remains after 1, 3, 6, and 12 months across six scenarios (high/medium/low reliability × best/worst budget).
@@ -21,11 +26,13 @@ Two tables:
 
 Scenarios where income ≥ expenses show `∞`.
 
+### Settings
+
+Export and import all data as JSON (single file) or CSV (separate files per table to a folder).
+
 ## Data
 
 All data is stored locally in a SQLite database (Room). No network access, no accounts.
-
-Use the **⋮ menu** in the top bar to export or import all data as JSON.
 
 ## Build
 
