@@ -25,6 +25,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.domain.LifetimeRow
+import com.timeofmylife.ui.LocalDemoMode
+import com.timeofmylife.ui.formatAmount
 import com.timeofmylife.ui.theme.*
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -144,6 +146,7 @@ private fun ScenarioLabel(label: String, dotColor: Color) {
 
 @Composable
 private fun BalanceRow(row: LifetimeRow, dotColor: Color) {
+    val demo = LocalDemoMode.current
     Row(
         modifier = Modifier.padding(vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -151,10 +154,10 @@ private fun BalanceRow(row: LifetimeRow, dotColor: Color) {
         Box(modifier = Modifier.width(120.dp).padding(vertical = 8.dp, horizontal = 4.dp)) {
             ScenarioLabel(row.label, dotColor)
         }
-        Cell(formatBalance(row.balance1m), 70.dp)
-        Cell(formatBalance(row.balance3m), 70.dp)
-        Cell(formatBalance(row.balance6m), 70.dp)
-        Cell(formatBalance(row.balance12m), 70.dp)
+        Cell(formatAmount(row.balance1m, demo), 70.dp)
+        Cell(formatAmount(row.balance3m, demo), 70.dp)
+        Cell(formatAmount(row.balance6m, demo), 70.dp)
+        Cell(formatAmount(row.balance12m, demo), 70.dp)
     }
 }
 
@@ -211,5 +214,3 @@ private fun Cell(text: String, width: Dp) {
     )
 }
 
-private fun formatBalance(amount: Double): String =
-    if (amount >= 0) "\$${amount.toLong()}" else "-\$${(-amount).toLong()}"

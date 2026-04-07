@@ -19,6 +19,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.data.model.Balance
 import com.timeofmylife.data.model.Reliability
+import com.timeofmylife.ui.LocalDemoMode
+import com.timeofmylife.ui.formatAmount
 import com.timeofmylife.ui.theme.HighColor
 import com.timeofmylife.ui.theme.LowColor
 import com.timeofmylife.ui.theme.MediumColor
@@ -138,7 +140,7 @@ private fun BalanceItem(
             ) {
                 Text(balance.name, style = MaterialTheme.typography.bodyLarge)
                 Text(
-                    "$${balance.amount.toLong()}",
+                    formatAmount(balance.amount, LocalDemoMode.current),
                     style = MaterialTheme.typography.bodyLarge,
                     color = reliabilityColor(balance.reliability)
                 )

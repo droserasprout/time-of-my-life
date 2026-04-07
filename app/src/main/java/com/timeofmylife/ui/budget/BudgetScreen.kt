@@ -21,6 +21,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.data.model.BudgetItem
 import com.timeofmylife.data.model.ItemType
+import com.timeofmylife.ui.LocalDemoMode
+import com.timeofmylife.ui.formatAmount
 import com.timeofmylife.ui.theme.BestBlue
 import com.timeofmylife.ui.theme.ExpenseRed
 import com.timeofmylife.ui.theme.IncomeGreen
@@ -185,14 +187,15 @@ private fun TotalsRow(
     last: Double,
     labelColor: Color,
 ) {
+    val demo = LocalDemoMode.current
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(label, style = MaterialTheme.typography.bodyMedium, color = labelColor, modifier = Modifier.weight(1f))
-        Text(formatAmount(good), style = MaterialTheme.typography.bodySmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
-        Text(formatAmount(last), style = MaterialTheme.typography.bodySmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
-        Text(formatAmount(bad), style = MaterialTheme.typography.bodySmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+        Text(formatAmount(good, demo), style = MaterialTheme.typography.bodySmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+        Text(formatAmount(last, demo), style = MaterialTheme.typography.bodySmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+        Text(formatAmount(bad, demo), style = MaterialTheme.typography.bodySmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
     }
 }
 
@@ -223,8 +226,6 @@ private fun TickBar(good: Double, bad: Double, last: Double, modifier: Modifier 
     )
 }
 
-private fun formatAmount(amount: Double): String =
-    if (amount >= 0) "\$${amount.toLong()}" else "-\$${(-amount).toLong()}"
 
 @Composable
 private fun BudgetItemRow(item: BudgetItem, onEdit: () -> Unit) {
@@ -247,11 +248,12 @@ private fun BudgetItemRow(item: BudgetItem, onEdit: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val demo = LocalDemoMode.current
             Text(item.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
             Row {
-                Text(formatAmount(item.goodAmount), style = MaterialTheme.typography.bodySmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
-                Text(formatAmount(item.lastAmount), style = MaterialTheme.typography.bodySmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
-                Text(formatAmount(item.badAmount), style = MaterialTheme.typography.bodySmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+                Text(formatAmount(item.goodAmount, demo), style = MaterialTheme.typography.bodySmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+                Text(formatAmount(item.lastAmount, demo), style = MaterialTheme.typography.bodySmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+                Text(formatAmount(item.badAmount, demo), style = MaterialTheme.typography.bodySmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
             }
         }
     }

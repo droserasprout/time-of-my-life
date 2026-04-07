@@ -7,10 +7,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.timeofmylife.data.FinanceRepository
+import com.timeofmylife.ui.LocalDemoMode
+import com.timeofmylife.ui.LocalSetDemoMode
 import com.timeofmylife.data.json.readCsvFromFolder
 import com.timeofmylife.data.json.readImportFromUri
 import com.timeofmylife.data.json.writeCsvToFolder
@@ -73,6 +76,9 @@ fun SettingsScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
         }
     }
 
+    val demoMode = LocalDemoMode.current
+    val setDemoMode = LocalSetDemoMode.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -83,6 +89,21 @@ fun SettingsScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                 end = 16.dp
             )
     ) {
+        Text("Display", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text("Demo mode", style = MaterialTheme.typography.bodyLarge)
+                Text("Hide all amounts", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Switch(checked = demoMode, onCheckedChange = { setDemoMode(it) })
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text("Export", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
         SettingsItem("Export JSON", "Single file with all data") {
             jsonExportLauncher.launch("finances.json")
