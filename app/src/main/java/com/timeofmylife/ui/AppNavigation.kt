@@ -2,6 +2,7 @@ package com.timeofmylife.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -11,7 +12,9 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.ui.balances.BalancesScreen
 import com.timeofmylife.ui.budget.BudgetScreen
@@ -48,16 +51,18 @@ fun AppNavigation(repository: FinanceRepository) {
             }
         }
     ) { innerPadding ->
+        val pagePadding = PaddingValues(0.dp)
         HorizontalPager(
             state = pagerState,
+            modifier = Modifier.padding(innerPadding),
             beyondViewportPageCount = 1,
             key = { screens[it].route }
         ) { page ->
             when (page) {
-                0 -> BalancesScreen(repository, innerPadding)
-                1 -> BudgetScreen(repository, innerPadding)
-                2 -> LifetimeScreen(repository, innerPadding)
-                3 -> SettingsScreen(repository, innerPadding)
+                0 -> BalancesScreen(repository, pagePadding)
+                1 -> BudgetScreen(repository, pagePadding)
+                2 -> LifetimeScreen(repository, pagePadding)
+                3 -> SettingsScreen(repository, pagePadding)
             }
         }
     }
