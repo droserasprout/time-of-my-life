@@ -1,8 +1,6 @@
 package com.timeofmylife.ui.budget
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -228,31 +226,32 @@ private fun TickBar(good: Double, bad: Double, last: Double, modifier: Modifier 
 private fun formatAmount(amount: Double): String =
     if (amount >= 0) "\$${amount.toLong()}" else "-\$${(-amount).toLong()}"
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun BudgetItemRow(item: BudgetItem, onEdit: () -> Unit) {
     val borderColor = if (item.type == ItemType.EXPENSE) ExpenseRed else IncomeGreen
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .combinedClickable(onClick = {}, onLongClick = onEdit)
+    Surface(
+        shape = MaterialTheme.shapes.medium,
+        tonalElevation = 1.dp,
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onEdit)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+            modifier = Modifier
+                .fillMaxWidth()
+                .drawBehind {
+                    drawRect(
+                        color = borderColor,
+                        size = androidx.compose.ui.geometry.Size(4.dp.toPx(), size.height)
+                    )
+                }
+                .padding(start = 16.dp, end = 12.dp, top = 10.dp, bottom = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(modifier = Modifier.width(4.dp).fillMaxHeight().background(borderColor))
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(item.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-                Row {
-                    Text(formatAmount(item.goodAmount), style = MaterialTheme.typography.bodySmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
-                    Text(formatAmount(item.lastAmount), style = MaterialTheme.typography.bodySmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
-                    Text(formatAmount(item.badAmount), style = MaterialTheme.typography.bodySmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
-                }
+            Text(item.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+            Row {
+                Text(formatAmount(item.goodAmount), style = MaterialTheme.typography.bodySmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+                Text(formatAmount(item.lastAmount), style = MaterialTheme.typography.bodySmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+                Text(formatAmount(item.badAmount), style = MaterialTheme.typography.bodySmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
             }
         }
     }
