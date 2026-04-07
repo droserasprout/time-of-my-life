@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -21,8 +22,12 @@ import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.domain.LifetimeRow
 import com.timeofmylife.ui.theme.LifetimeRowColors
 import com.timeofmylife.ui.theme.NegativeText
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
-private val COLUMNS = listOf("Scenario", "1m", "3m", "6m", "12m", "left")
+private val BALANCE_COLUMNS = listOf("Scenario", "1m", "3m", "6m", "12m")
+private val SURVIVAL_COLUMNS = listOf("Scenario", "Months", "Days", "Final Day")
+private val FINAL_DAY_FMT = DateTimeFormatter.ofPattern("MMM yyyy")
 
 @Composable
 fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
@@ -33,27 +38,50 @@ fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
         modifier = Modifier
             .fillMaxSize()
             .padding(top = innerPadding.calculateTopPadding(), bottom = innerPadding.calculateBottomPadding())
-            .horizontalScroll(rememberScrollState())
             .verticalScroll(rememberScrollState())
-            .padding(16.dp)
     ) {
-            // Header row
+        // Balance matrix table
+        Column(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(16.dp)) {
             Row {
-                COLUMNS.forEachIndexed { i, col ->
+                BALANCE_COLUMNS.forEachIndexed { i, col ->
                     HeaderCell(col, if (i == 0) 120.dp else 70.dp)
                 }
             }
             HorizontalDivider()
-
             rows.forEachIndexed { index, row ->
-                MatrixRow(row, LifetimeRowColors.getOrElse(index) { Color.Transparent })
+                BalanceRow(row, LifetimeRowColors.getOrElse(index) { Color.Transparent })
                 HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Survival table
+        Column(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
+            Row {
+                SURVIVAL_COLUMNS.forEachIndexed { i, col ->
+                    HeaderCell(col, survivalColWidth(i))
+                }
+            }
+            HorizontalDivider()
+            rows.forEachIndexed { index, row ->
+                SurvivalRow(row, LifetimeRowColors.getOrElse(index) { Color.Transparent })
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+private fun survivalColWidth(index: Int): Dp = when (index) {
+    0 -> 120.dp
+    3 -> 90.dp
+    else -> 70.dp
 }
 
 @Composable
-private fun HeaderCell(text: String, width: androidx.compose.ui.unit.Dp) {
+private fun HeaderCell(text: String, width: Dp) {
     Text(
         text = text,
         style = MaterialTheme.typography.labelMedium,
@@ -66,35 +94,44 @@ private fun HeaderCell(text: String, width: androidx.compose.ui.unit.Dp) {
 }
 
 @Composable
-private fun MatrixRow(row: LifetimeRow, background: Color) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 2.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Surface(color = background, modifier = Modifier.fillMaxWidth()) {
-            Row {
-                Cell(row.label, 120.dp, isLabel = true)
-                Cell(formatBalance(row.balance1m), 70.dp)
-                Cell(formatBalance(row.balance3m), 70.dp)
-                Cell(formatBalance(row.balance6m), 70.dp)
-                Cell(formatBalance(row.balance12m), 70.dp)
-                Cell(formatMonths(row.monthsLeft), 70.dp)
-            }
+private fun BalanceRow(row: LifetimeRow, background: Color) {
+    Surface(color = background) {
+        Row(modifier = Modifier.padding(vertical = 2.dp)) {
+            Cell(row.label, 120.dp, isLabel = true)
+            Cell(formatBalance(row.balance1m), 70.dp)
+            Cell(formatBalance(row.balance3m), 70.dp)
+            Cell(formatBalance(row.balance6m), 70.dp)
+            Cell(formatBalance(row.balance12m), 70.dp)
         }
     }
 }
 
 @Composable
-private fun Cell(text: String, width: androidx.compose.ui.unit.Dp, isLabel: Boolean = false) {
+private fun SurvivalRow(row: LifetimeRow, background: Color) {
+    val months = row.monthsLeft
+    val days = if (months.isInfinite()) Double.POSITIVE_INFINITY else months * 30.44
+    val finalDay = when {
+        months.isInfinite() -> "∞"
+        else -> LocalDate.now().plusDays(days.toLong()).format(FINAL_DAY_FMT)
+    }
+    Surface(color = background) {
+        Row(modifier = Modifier.padding(vertical = 2.dp)) {
+            Cell(row.label, 120.dp, isLabel = true)
+            Cell(formatMonths(months), 70.dp)
+            Cell(formatDays(days), 70.dp)
+            Cell(finalDay, 90.dp)
+        }
+    }
+}
+
+@Composable
+private fun Cell(text: String, width: Dp, isLabel: Boolean = false) {
     val isNegative = text.startsWith("-")
     Text(
         text = text,
         style = MaterialTheme.typography.bodySmall,
         color = when {
             isNegative -> NegativeText
-            isLabel -> MaterialTheme.colorScheme.onSurface
             else -> MaterialTheme.colorScheme.onSurface
         },
         textAlign = if (isLabel) TextAlign.Start else TextAlign.End,
@@ -104,10 +141,11 @@ private fun Cell(text: String, width: androidx.compose.ui.unit.Dp, isLabel: Bool
     )
 }
 
-private fun formatBalance(amount: Double): String = when {
-    amount >= 0 -> "$${amount.toLong()}"
-    else -> "-$${(-amount).toLong()}"
-}
+private fun formatBalance(amount: Double): String =
+    if (amount >= 0) "\$${amount.toLong()}" else "-\$${(-amount).toLong()}"
 
 private fun formatMonths(months: Double): String =
     if (months.isInfinite()) "∞" else months.toLong().toString()
+
+private fun formatDays(days: Double): String =
+    if (days.isInfinite()) "∞" else days.toLong().toString()
