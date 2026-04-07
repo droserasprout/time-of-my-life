@@ -1,7 +1,7 @@
 package com.timeofmylife.ui.balances
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -22,6 +23,12 @@ import com.timeofmylife.ui.theme.HighColor
 import com.timeofmylife.ui.theme.LowColor
 import com.timeofmylife.ui.theme.MediumColor
 
+private fun reliabilityColor(reliability: Reliability): Color = when (reliability) {
+    Reliability.HIGH -> HighColor
+    Reliability.MEDIUM -> MediumColor
+    Reliability.LOW -> LowColor
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BalancesScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
@@ -29,6 +36,7 @@ fun BalancesScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     val grouped by vm.grouped.collectAsStateWithLifecycle()
     var showAddDialog by remember { mutableStateOf(false) }
     var editTarget by remember { mutableStateOf<Balance?>(null) }
+    var quickEditTarget by remember { mutableStateOf<Balance?>(null) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -49,18 +57,18 @@ fun BalancesScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                                 Reliability.MEDIUM -> "Medium reliability"
                                 Reliability.LOW -> "Low reliability"
                             },
-                            color = when (reliability) {
-                                Reliability.HIGH -> HighColor
-                                Reliability.MEDIUM -> MediumColor
-                                Reliability.LOW -> LowColor
-                            },
+                            color = reliabilityColor(reliability),
                             style = MaterialTheme.typography.labelLarge,
                             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                         )
                     }
                 }
                 items(items, key = { it.id }) { balance ->
-                    BalanceItem(balance = balance, onEdit = { editTarget = balance }, onDelete = { vm.delete(balance) })
+                    BalanceItem(
+                        balance = balance,
+                        onTap = { quickEditTarget = balance },
+                        onDelete = { vm.delete(balance) }
+                    )
                 }
             }
         }
@@ -80,13 +88,21 @@ fun BalancesScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     editTarget?.let { target ->
         AddEditBalanceDialog(target, onConfirm = { vm.upsert(it); editTarget = null }, onDismiss = { editTarget = null })
     }
+    quickEditTarget?.let { target ->
+        QuickEditBalanceDialog(
+            balance = target,
+            onSave = { vm.upsert(it); quickEditTarget = null },
+            onFullEdit = { quickEditTarget = null; editTarget = target },
+            onDismiss = { quickEditTarget = null }
+        )
+    }
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BalanceItem(
     balance: Balance,
-    onEdit: () -> Unit,
+    onTap: () -> Unit,
     onDelete: () -> Unit
 ) {
     val dismissState = rememberSwipeToDismissBoxState(
@@ -111,9 +127,7 @@ private fun BalanceItem(
         }
     ) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .combinedClickable(onClick = {}, onLongClick = onEdit)
+            modifier = Modifier.fillMaxWidth().clickable(onClick = onTap)
         ) {
             Row(
                 modifier = Modifier
@@ -126,7 +140,7 @@ private fun BalanceItem(
                 Text(
                     "$${balance.amount.toLong()}",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = reliabilityColor(balance.reliability)
                 )
             }
         }
