@@ -1,12 +1,14 @@
 package com.timeofmylife.ui.budget
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.timeofmylife.data.model.BudgetItem
 import com.timeofmylife.data.model.ItemType
 
@@ -14,6 +16,7 @@ import com.timeofmylife.data.model.ItemType
 fun AddEditBudgetItemDialog(
     initial: BudgetItem?,
     onConfirm: (BudgetItem) -> Unit,
+    onDelete: (() -> Unit)? = null,
     onDismiss: () -> Unit
 ) {
     var name by remember { mutableStateOf(initial?.name ?: "") }
@@ -21,11 +24,13 @@ fun AddEditBudgetItemDialog(
     var goodText by remember { mutableStateOf(initial?.goodAmount?.toString() ?: "") }
     var badText by remember { mutableStateOf(initial?.badAmount?.toString() ?: "") }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(if (initial == null) "Add Budget Item" else "Edit Budget Item") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Dialog(onDismissRequest = onDismiss) {
+        Card(shape = RoundedCornerShape(16.dp)) {
+            Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    if (initial == null) "Add Budget Item" else "Edit Budget Item",
+                    style = MaterialTheme.typography.titleLarge
+                )
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
@@ -59,20 +64,32 @@ fun AddEditBudgetItemDialog(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true
                 )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    val good = goodText.toDoubleOrNull() ?: return@TextButton
-                    val bad = badText.toDoubleOrNull() ?: return@TextButton
-                    if (name.isBlank()) return@TextButton
-                    onConfirm(BudgetItem(id = initial?.id ?: 0, name = name.trim(), type = type, goodAmount = good, badAmount = bad))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    // Delete on the left, only in edit mode
+                    if (onDelete != null) {
+                        TextButton(
+                            onClick = onDelete,
+                            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                        ) { Text("Delete") }
+                    } else {
+                        Spacer(Modifier.weight(1f))
+                    }
+                    Row {
+                        TextButton(onClick = onDismiss) { Text("Cancel") }
+                        TextButton(
+                            onClick = {
+                                val good = goodText.toDoubleOrNull() ?: return@TextButton
+                                val bad = badText.toDoubleOrNull() ?: return@TextButton
+                                if (name.isBlank()) return@TextButton
+                                onConfirm(BudgetItem(id = initial?.id ?: 0, name = name.trim(), type = type, goodAmount = good, badAmount = bad))
+                            }
+                        ) { Text("Save") }
+                    }
                 }
-            ) { Text("Save") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            }
         }
-    )
+    }
 }
