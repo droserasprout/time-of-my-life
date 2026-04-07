@@ -5,14 +5,34 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.data.model.BudgetItem
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+enum class SortOrder { ALPHA, SIZE }
+
 class BudgetViewModel(private val repo: FinanceRepository) : ViewModel() {
 
-    val items = repo.budgetItems
+    private val _sortOrder = MutableStateFlow(SortOrder.ALPHA)
+    val sortOrder: StateFlow<SortOrder> = _sortOrder.asStateFlow()
+
+    private val rawItems = repo.budgetItems
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val items: StateFlow<List<BudgetItem>> = combine(rawItems, _sortOrder) { list, order ->
+        when (order) {
+            SortOrder.ALPHA -> list.sortedBy { it.name.lowercase() }
+            SortOrder.SIZE -> list.sortedByDescending { it.goodAmount }
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun toggleSort() {
+        _sortOrder.value = if (_sortOrder.value == SortOrder.ALPHA) SortOrder.SIZE else SortOrder.ALPHA
+    }
 
     fun upsert(item: BudgetItem) = viewModelScope.launch { repo.upsertBudgetItem(item) }
     fun delete(item: BudgetItem) = viewModelScope.launch { repo.deleteBudgetItem(item) }
