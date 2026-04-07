@@ -8,6 +8,9 @@ val OnPurple = Color(0xFFFFFFFF)
 
 val ExpenseRed = Color(0xFFEF5350)
 val IncomeGreen = Color(0xFF66BB6A)
+val BestBlue = Color(0xFF42A5F5)
+val WorstOrange = Color(0xFFFF9800)
+val LastGrey = Color(0xFF9E9E9E)
 val NegativeText = Color(0xFFEF9A9A)
 
 val HighColor = Color(0xFFA5D6A7)     // green text for HIGH

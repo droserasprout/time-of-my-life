@@ -15,7 +15,8 @@ data class BudgetItemExport(
     val name: String,
     val type: String,
     val goodAmount: Double,
-    val badAmount: Double
+    val badAmount: Double,
+    val lastAmount: Double = 0.0
 )
 
 @Serializable
@@ -25,7 +26,7 @@ data class AppDataExport(
 )
 
 fun Balance.toExport() = BalanceExport(name, reliability.name, amount)
-fun BudgetItem.toExport() = BudgetItemExport(name, type.name, goodAmount, badAmount)
+fun BudgetItem.toExport() = BudgetItemExport(name, type.name, goodAmount, badAmount, lastAmount)
 
 fun BalanceExport.toEntity() = Balance(
     name = name,
@@ -37,5 +38,6 @@ fun BudgetItemExport.toEntity() = BudgetItem(
     name = name,
     type = ItemType.valueOf(type),
     goodAmount = goodAmount,
-    badAmount = badAmount
+    badAmount = badAmount,
+    lastAmount = lastAmount
 )

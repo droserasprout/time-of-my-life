@@ -11,5 +11,6 @@ data class BudgetItem(
     val name: String,
     val type: ItemType,
     val goodAmount: Double,
-    val badAmount: Double
+    val badAmount: Double,
+    val lastAmount: Double = 0.0
 )

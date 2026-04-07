@@ -23,6 +23,7 @@ fun AddEditBudgetItemDialog(
     var type by remember { mutableStateOf(initial?.type ?: ItemType.EXPENSE) }
     var goodText by remember { mutableStateOf(initial?.goodAmount?.toString() ?: "") }
     var badText by remember { mutableStateOf(initial?.badAmount?.toString() ?: "") }
+    var lastText by remember { mutableStateOf(initial?.lastAmount?.let { if (it == 0.0) "" else it.toString() } ?: "") }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(shape = RoundedCornerShape(16.dp)) {
@@ -64,6 +65,14 @@ fun AddEditBudgetItemDialog(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true
                 )
+                OutlinedTextField(
+                    value = lastText,
+                    onValueChange = { lastText = it },
+                    label = { Text("Last month (USD)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    singleLine = true
+                )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -84,7 +93,8 @@ fun AddEditBudgetItemDialog(
                                 val good = goodText.toDoubleOrNull() ?: return@TextButton
                                 val bad = badText.toDoubleOrNull() ?: return@TextButton
                                 if (name.isBlank()) return@TextButton
-                                onConfirm(BudgetItem(id = initial?.id ?: 0, name = name.trim(), type = type, goodAmount = good, badAmount = bad))
+                                val last = lastText.toDoubleOrNull() ?: 0.0
+                                onConfirm(BudgetItem(id = initial?.id ?: 0, name = name.trim(), type = type, goodAmount = good, badAmount = bad, lastAmount = last))
                             }
                         ) { Text("Save") }
                     }

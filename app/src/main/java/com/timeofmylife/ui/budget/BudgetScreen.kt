@@ -13,22 +13,23 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.data.model.BudgetItem
 import com.timeofmylife.data.model.ItemType
+import com.timeofmylife.ui.theme.BestBlue
 import com.timeofmylife.ui.theme.ExpenseRed
 import com.timeofmylife.ui.theme.IncomeGreen
+import com.timeofmylife.ui.theme.LastGrey
+import com.timeofmylife.ui.theme.WorstOrange
 
-private val AMOUNT_COL_WIDTH = 68.dp
+private val AMOUNT_COL_WIDTH = 64.dp
 
 @Composable
 fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
@@ -42,8 +43,10 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     val incomes = remember(items) { items.filter { it.type == ItemType.INCOME } }
     val expenseGood = remember(expenses) { expenses.sumOf { it.goodAmount } }
     val expenseBad = remember(expenses) { expenses.sumOf { it.badAmount } }
+    val expenseLast = remember(expenses) { expenses.sumOf { it.lastAmount } }
     val incomeGood = remember(incomes) { incomes.sumOf { it.goodAmount } }
     val incomeBad = remember(incomes) { incomes.sumOf { it.badAmount } }
+    val incomeLast = remember(incomes) { incomes.sumOf { it.lastAmount } }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -68,7 +71,8 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
             // Totals pinned below sort row
             if (items.isNotEmpty()) {
                 TotalsCard(
-                    expenseGood, expenseBad, incomeGood, incomeBad,
+                    expenseGood, expenseBad, expenseLast,
+                    incomeGood, incomeBad, incomeLast,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                 )
             }
@@ -144,38 +148,33 @@ private fun SectionHeader(label: String, color: Color) {
 private fun TotalsCard(
     expenseGood: Double,
     expenseBad: Double,
+    expenseLast: Double,
     incomeGood: Double,
     incomeBad: Double,
+    incomeLast: Double,
     modifier: Modifier = Modifier
 ) {
     val netGood = incomeGood - expenseGood
     val netBad = incomeBad - expenseBad
+    val netLast = incomeLast - expenseLast
     Card(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
+            // Header row
             Row(modifier = Modifier.fillMaxWidth()) {
                 Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    "best", style = MaterialTheme.typography.labelSmall,
-                    color = IncomeGreen, textAlign = TextAlign.End,
-                    modifier = Modifier.width(AMOUNT_COL_WIDTH)
-                )
-                Text(
-                    "worst", style = MaterialTheme.typography.labelSmall,
-                    color = ExpenseRed, textAlign = TextAlign.End,
-                    modifier = Modifier.width(AMOUNT_COL_WIDTH)
-                )
+                Text("best", style = MaterialTheme.typography.labelSmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+                Text("last", style = MaterialTheme.typography.labelSmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+                Text("worst", style = MaterialTheme.typography.labelSmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
             }
-            TotalsRow("Expenses", expenseGood, expenseBad, ExpenseRed)
-            TotalsRow("Income", incomeGood, incomeBad, IncomeGreen)
+            TotalsRow("Expenses", expenseGood, expenseBad, expenseLast, ExpenseRed)
+            TotalsRow("Income", incomeGood, incomeBad, incomeLast, IncomeGreen)
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-            TotalsRow(
-                label = "Net",
-                good = netGood,
-                bad = netBad,
-                labelColor = MaterialTheme.colorScheme.onSurface,
-                goodColor = if (netGood >= 0) IncomeGreen else ExpenseRed,
-                badColor = if (netBad >= 0) IncomeGreen else ExpenseRed
-            )
+            TotalsRow("Net", netGood, netBad, netLast, MaterialTheme.colorScheme.onSurface)
+            // Single tick bar spanning all 3 columns
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.weight(1f))
+                TickBar(good = netGood, bad = netBad, last = netLast, modifier = Modifier.width(AMOUNT_COL_WIDTH * 3))
+            }
         }
     }
 }
@@ -185,18 +184,45 @@ private fun TotalsRow(
     label: String,
     good: Double,
     bad: Double,
-    labelColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface,
-    goodColor: androidx.compose.ui.graphics.Color = IncomeGreen,
-    badColor: androidx.compose.ui.graphics.Color = ExpenseRed,
+    last: Double,
+    labelColor: Color,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(label, style = MaterialTheme.typography.bodyMedium, color = labelColor, modifier = Modifier.weight(1f))
-        Text(formatAmount(good), style = MaterialTheme.typography.bodySmall, color = goodColor, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
-        Text(formatAmount(bad), style = MaterialTheme.typography.bodySmall, color = badColor, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+        Text(formatAmount(good), style = MaterialTheme.typography.bodySmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+        Text(formatAmount(last), style = MaterialTheme.typography.bodySmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+        Text(formatAmount(bad), style = MaterialTheme.typography.bodySmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
     }
+}
+
+@Composable
+private fun TickBar(good: Double, bad: Double, last: Double, modifier: Modifier = Modifier) {
+    val range = bad - good
+    val fraction = if (range != 0.0) ((last - good) / range).toFloat().coerceIn(0f, 1f) else 0.5f
+    val barColor = LastGrey.copy(alpha = 0.3f)
+    val tickColor = LastGrey
+    Box(
+        modifier = modifier
+            .height(4.dp)
+            .drawBehind {
+                drawLine(
+                    color = barColor,
+                    start = Offset(0f, size.height / 2),
+                    end = Offset(size.width, size.height / 2),
+                    strokeWidth = 2.dp.toPx()
+                )
+                val tickX = fraction * size.width
+                drawLine(
+                    color = tickColor,
+                    start = Offset(tickX, 0f),
+                    end = Offset(tickX, size.height),
+                    strokeWidth = 2.dp.toPx()
+                )
+            }
+    )
 }
 
 private fun formatAmount(amount: Double): String =
@@ -221,23 +247,12 @@ private fun BudgetItemRow(item: BudgetItem, onEdit: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(item.name, style = MaterialTheme.typography.bodyLarge)
-                Text(
-                    buildAnnotatedString {
-                        withStyle(SpanStyle(fontSize = 14.sp, color = IncomeGreen)) {
-                            append("\$${item.goodAmount.toLong()}")
-                        }
-                        withStyle(SpanStyle(fontSize = 10.sp, color = IncomeGreen.copy(alpha = 0.7f))) {
-                            append(" best ")
-                        }
-                        withStyle(SpanStyle(fontSize = 14.sp, color = ExpenseRed)) {
-                            append("\$${item.badAmount.toLong()}")
-                        }
-                        withStyle(SpanStyle(fontSize = 10.sp, color = ExpenseRed.copy(alpha = 0.7f))) {
-                            append(" worst")
-                        }
-                    }
-                )
+                Text(item.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                Row {
+                    Text(formatAmount(item.goodAmount), style = MaterialTheme.typography.bodySmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+                    Text(formatAmount(item.lastAmount), style = MaterialTheme.typography.bodySmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+                    Text(formatAmount(item.badAmount), style = MaterialTheme.typography.bodySmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+                }
             }
         }
     }
