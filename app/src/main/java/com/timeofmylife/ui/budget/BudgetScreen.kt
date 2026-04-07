@@ -14,8 +14,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.timeofmylife.data.FinanceRepository
@@ -42,14 +46,11 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Sort row — outside LazyColumn to avoid stickyHeader overhead
+            // Sort row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(
-                        top = innerPadding.calculateTopPadding() + 4.dp,
-                        start = 16.dp, end = 4.dp
-                    ),
+                    .padding(top = innerPadding.calculateTopPadding() + 4.dp, start = 16.dp, end = 4.dp),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -63,8 +64,17 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                 }
             }
 
+            // Totals pinned below sort row
+            if (items.isNotEmpty()) {
+                TotalsCard(
+                    expenseGood, expenseBad, incomeGood, incomeBad,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                )
+            }
+
             LazyColumn(
                 contentPadding = PaddingValues(
+                    top = 8.dp,
                     bottom = innerPadding.calculateBottomPadding() + 80.dp,
                     start = 16.dp, end = 16.dp
                 ),
@@ -73,11 +83,6 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
             ) {
                 items(items, key = { it.id }) { item ->
                     BudgetItemRow(item = item, onEdit = { editTarget = item }, onDelete = { vm.delete(item) })
-                }
-                if (items.isNotEmpty()) {
-                    item {
-                        TotalsCard(expenseGood, expenseBad, incomeGood, incomeBad)
-                    }
                 }
             }
         }
@@ -113,13 +118,13 @@ private fun TotalsCard(
     expenseGood: Double,
     expenseBad: Double,
     incomeGood: Double,
-    incomeBad: Double
+    incomeBad: Double,
+    modifier: Modifier = Modifier
 ) {
     val netGood = incomeGood - expenseGood
     val netBad = incomeBad - expenseBad
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
-            // Header row aligning amount columns
             Row(modifier = Modifier.fillMaxWidth()) {
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
@@ -197,7 +202,6 @@ private fun BudgetItemRow(
         }
     )
 
-    // Snap back any item that was restored in swiped state (e.g. after navigation)
     LaunchedEffect(dismissState.currentValue) {
         if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart && !pendingDelete) {
             dismissState.snapTo(SwipeToDismissBoxValue.Settled)
@@ -243,13 +247,13 @@ private fun BudgetItemRow(
                 .combinedClickable(onClick = {}, onLongClick = onEdit)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
                         .width(4.dp)
-                        .height(60.dp)
+                        .fillMaxHeight()
                         .background(borderColor)
                 )
                 Row(
@@ -259,18 +263,23 @@ private fun BudgetItemRow(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
-                        Text(item.name, style = MaterialTheme.typography.bodyLarge)
-                        Text(
-                            text = item.type.name.lowercase().replaceFirstChar { it.uppercase() },
-                            style = MaterialTheme.typography.labelSmall,
-                            color = borderColor
-                        )
-                    }
-                    Column(horizontalAlignment = Alignment.End) {
-                        Text("best \$${item.goodAmount.toLong()}", style = MaterialTheme.typography.bodySmall, color = IncomeGreen)
-                        Text("worst \$${item.badAmount.toLong()}", style = MaterialTheme.typography.bodySmall, color = ExpenseRed)
-                    }
+                    Text(item.name, style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(SpanStyle(fontSize = 14.sp, color = IncomeGreen)) {
+                                append("\$${item.goodAmount.toLong()}")
+                            }
+                            withStyle(SpanStyle(fontSize = 10.sp, color = IncomeGreen.copy(alpha = 0.7f))) {
+                                append(" best ")
+                            }
+                            withStyle(SpanStyle(fontSize = 14.sp, color = ExpenseRed)) {
+                                append("\$${item.badAmount.toLong()}")
+                            }
+                            withStyle(SpanStyle(fontSize = 10.sp, color = ExpenseRed.copy(alpha = 0.7f))) {
+                                append(" worst")
+                            }
+                        }
+                    )
                 }
             }
         }
