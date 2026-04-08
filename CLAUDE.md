@@ -25,7 +25,7 @@ Android app (Kotlin, Jetpack Compose, Room, Material 3) that calculates how long
 
 - Default runtime: OpenJDK 21.0.10 (`java -version`)
 - Installed JVMs under `/usr/lib/jvm/`: `java-17-openjdk`, `java-21-openjdk`, `java-26-jdk`, `java-26-openjdk`
-- For Android projects targeting Java 17: set `JAVA_HOME=/usr/lib/jvm/java-17-openjdk` and use `kotlin { jvmToolchain(17) }` in `app/build.gradle.kts`
+- For Android projects targeting Java 21: set `JAVA_HOME=/usr/lib/jvm/java-21-openjdk` and use `kotlin { jvmToolchain(21) }` in `app/build.gradle.kts`
 
 ### Android
 
