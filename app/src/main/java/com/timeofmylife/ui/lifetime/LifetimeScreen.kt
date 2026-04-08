@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,6 +50,7 @@ private val BUDGET_COLORS = mapOf(
 fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     val vm: LifetimeViewModel = viewModel(factory = LifetimeViewModel.Factory(repository))
     val rows by vm.rows.collectAsStateWithLifecycle()
+    val includeIncome by vm.includeIncome.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
@@ -56,6 +58,26 @@ fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
             .padding(top = innerPadding.calculateTopPadding(), bottom = innerPadding.calculateBottomPadding())
             .verticalScroll(rememberScrollState())
     ) {
+        // Income toggle
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "Income",
+                style = MaterialTheme.typography.labelMedium,
+                color = if (includeIncome) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Switch(
+                checked = includeIncome,
+                onCheckedChange = { vm.toggleIncome() },
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+
         // Balance matrix table (horizontal scroll for narrow screens)
         Column(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(16.dp)) {
             Row {

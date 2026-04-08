@@ -28,7 +28,7 @@ object LifetimeCalculator {
         ScenarioDef(setOf(Reliability.HIGH, Reliability.MEDIUM, Reliability.LOW), true, "low / best"),
     )
 
-    fun calculate(balances: List<Balance>, budgetItems: List<BudgetItem>): List<LifetimeRow> =
+    fun calculate(balances: List<Balance>, budgetItems: List<BudgetItem>, includeIncome: Boolean = true): List<LifetimeRow> =
         SCENARIOS.map { scenario ->
             val totalBalance = balances
                 .filter { it.reliability in scenario.tiers }
@@ -38,9 +38,10 @@ object LifetimeCalculator {
                 .filter { it.type == ItemType.EXPENSE }
                 .sumOf { if (scenario.useGood) it.goodAmount else it.badAmount }
 
-            val totalIncomes = budgetItems
+            val totalIncomes = if (includeIncome) budgetItems
                 .filter { it.type == ItemType.INCOME }
                 .sumOf { if (scenario.useGood) it.goodAmount else it.badAmount }
+            else 0.0
 
             val netBurn = totalExpenses - totalIncomes
 
