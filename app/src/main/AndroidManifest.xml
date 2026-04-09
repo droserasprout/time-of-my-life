@@ -4,7 +4,7 @@
     <application
         android:name=".TimeOfMyLifeApp"
         android:label="Time of My Life"
-        android:theme="@android:style/Theme.DeviceDefault"
+        android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
         android:allowBackup="true"
         android:supportsRtl="true">
         <activity

@@ -82,9 +82,6 @@ fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
             )
         }
 
-        // Coverage bar
-        LifetimeCoverageBar(rows)
-
         // Balance matrix table (horizontal scroll for narrow screens)
         Column(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(16.dp)) {
             Row {
@@ -116,6 +113,9 @@ fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Coverage bar
+        LifetimeCoverageBar(rows)
     }
 }
 
