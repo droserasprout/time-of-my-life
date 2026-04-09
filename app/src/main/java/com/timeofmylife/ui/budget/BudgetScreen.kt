@@ -21,6 +21,7 @@ import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.data.model.BudgetItem
 import com.timeofmylife.data.model.ItemType
 import com.timeofmylife.ui.LocalDemoMode
+import com.timeofmylife.ui.QuickEditDialog
 import com.timeofmylife.ui.SegmentedSelector
 import com.timeofmylife.ui.formatAmount
 import com.timeofmylife.ui.theme.BestBlue
@@ -31,6 +32,8 @@ import com.timeofmylife.ui.theme.WorstOrange
 
 private val AMOUNT_COL_WIDTH = 64.dp
 
+enum class BudgetColumn { BEST, LAST, WORST }
+
 @Composable
 fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     val vm: BudgetViewModel = viewModel(factory = BudgetViewModel.Factory(repository))
@@ -39,7 +42,7 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     val ascending by vm.ascending.collectAsStateWithLifecycle()
     var showAddDialog by remember { mutableStateOf(false) }
     var editTarget by remember { mutableStateOf<BudgetItem?>(null) }
-    var quickEditTarget by remember { mutableStateOf<BudgetItem?>(null) }
+    var quickEditTarget by remember { mutableStateOf<Pair<BudgetItem, BudgetColumn>?>(null) }
 
     val expenses = remember(items) { items.filter { it.type == ItemType.EXPENSE } }
     val incomes = remember(items) { items.filter { it.type == ItemType.INCOME } }
@@ -90,13 +93,21 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                 if (expenses.isNotEmpty()) {
                     item { SectionHeader("Expenses", ExpenseRed) }
                     items(expenses, key = { it.id }) { item ->
-                        BudgetItemRow(item = item, onEdit = { quickEditTarget = item })
+                        BudgetItemRow(
+                            item = item,
+                            onColumnClick = { col -> quickEditTarget = item to col },
+                            onNameClick = { editTarget = item }
+                        )
                     }
                 }
                 if (incomes.isNotEmpty()) {
                     item { SectionHeader("Income", IncomeGreen) }
                     items(incomes, key = { it.id }) { item ->
-                        BudgetItemRow(item = item, onEdit = { quickEditTarget = item })
+                        BudgetItemRow(
+                            item = item,
+                            onColumnClick = { col -> quickEditTarget = item to col },
+                            onNameClick = { editTarget = item }
+                        )
                     }
                 }
             }
@@ -127,10 +138,28 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
             onDismiss = { editTarget = null }
         )
     }
-    quickEditTarget?.let { target ->
-        QuickEditBudgetItemDialog(
-            item = target,
-            onSave = { vm.upsert(it); quickEditTarget = null },
+    quickEditTarget?.let { (target, column) ->
+        val columnLabel = when (column) {
+            BudgetColumn.BEST -> "best"
+            BudgetColumn.LAST -> "last"
+            BudgetColumn.WORST -> "worst"
+        }
+        val initialValue = when (column) {
+            BudgetColumn.BEST -> target.goodAmount
+            BudgetColumn.LAST -> target.lastAmount
+            BudgetColumn.WORST -> target.badAmount
+        }
+        QuickEditDialog(
+            title = "${target.name} | $columnLabel",
+            initialValue = if (initialValue == 0.0) "" else initialValue.toString(),
+            onSave = { amount ->
+                val updated = when (column) {
+                    BudgetColumn.BEST -> target.copy(goodAmount = amount)
+                    BudgetColumn.LAST -> target.copy(lastAmount = amount)
+                    BudgetColumn.WORST -> target.copy(badAmount = amount)
+                }
+                vm.upsert(updated); quickEditTarget = null
+            },
             onFullEdit = { quickEditTarget = null; editTarget = target },
             onDismiss = { quickEditTarget = null }
         )
@@ -236,12 +265,12 @@ private fun TickBar(good: Double, bad: Double, last: Double, modifier: Modifier 
 
 
 @Composable
-private fun BudgetItemRow(item: BudgetItem, onEdit: () -> Unit) {
+private fun BudgetItemRow(item: BudgetItem, onColumnClick: (BudgetColumn) -> Unit, onNameClick: () -> Unit) {
     val borderColor = if (item.type == ItemType.EXPENSE) ExpenseRed else IncomeGreen
     Surface(
         shape = MaterialTheme.shapes.medium,
         tonalElevation = 1.dp,
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onEdit)
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
@@ -257,11 +286,11 @@ private fun BudgetItemRow(item: BudgetItem, onEdit: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             val demo = LocalDemoMode.current
-            Text(item.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+            Text(item.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f).clickable(onClick = onNameClick))
             Row {
-                Text(formatAmount(item.goodAmount, demo), style = MaterialTheme.typography.bodySmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
-                Text(formatAmount(item.lastAmount, demo), style = MaterialTheme.typography.bodySmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
-                Text(formatAmount(item.badAmount, demo), style = MaterialTheme.typography.bodySmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+                Text(formatAmount(item.goodAmount, demo), style = MaterialTheme.typography.bodySmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH).clickable { onColumnClick(BudgetColumn.BEST) })
+                Text(formatAmount(item.lastAmount, demo), style = MaterialTheme.typography.bodySmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH).clickable { onColumnClick(BudgetColumn.LAST) })
+                Text(formatAmount(item.badAmount, demo), style = MaterialTheme.typography.bodySmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH).clickable { onColumnClick(BudgetColumn.WORST) })
             }
         }
     }
