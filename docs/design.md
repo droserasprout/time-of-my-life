@@ -148,12 +148,12 @@ Box(fillMaxSize)
 Column(fillMaxSize, padding: top/bottom=innerPadding)
   Column(weight=1, verticalScroll)
     SegmentedSelector (all | expense | income)
-    Balance table (horizontalScroll, padding=16)
-      HeaderCell: 120dp scenario + 70dp per period, labelMedium, alpha=0.6
-      BalanceRow: bodySmall amounts, NegativeText for negatives
+    Balance table (fillMaxWidth, padding: h=16)
+      HeaderCell: weight=1f each, labelMedium, alpha=0.6
+      BalanceRow: weight=1f each, bodySmall, NegativeText if negative
       Dividers: outline, alpha=0.2
     Spacer(16)
-    Survival table (padding: h=16)
+    Survival table (fillMaxWidth, padding: h=16)
       SurvivalHeaderCell: weight=1f each, labelMedium, alpha=0.6
       SurvivalRow: bodySmall, scenario dots 8dp CircleShape
       Dividers: outline, alpha=0.2
@@ -170,13 +170,13 @@ Column(fillMaxSize, padding: top/bottom=innerPadding)
 
 ```text
 Column(fillMaxSize, padding: top=innerPadding+16, bottom=innerPadding, start/end=16)
-  Section "Display" (titleSmall, primary)
+  Section "Display" (labelMedium, primary)
     Demo mode row: bodyLarge + bodySmall, Switch
   Spacer(16)
-  Section "Data" (titleSmall, primary)
+  Section "Data" (labelMedium, primary)
     SettingsItem: "Import / Export" -> nested ImportExportScreen
   Spacer(16)
-  Section "Help" (titleSmall, primary)
+  Section "Help" (labelMedium, primary)
     SettingsItem: "Show welcome screen"
     SettingsItem: "Show help"
 ```
@@ -185,10 +185,10 @@ Column(fillMaxSize, padding: top=innerPadding+16, bottom=innerPadding, start/end
 
 ```text
 Column(fillMaxSize, padding: top=innerPadding+16, bottom=innerPadding, start/end=16)
-  Section "Export" (titleSmall, primary)
+  Section "Export" (labelMedium, primary)
     3x ImportExportItem (bodyLarge + bodySmall)
   Spacer(16)
-  Section "Import" (titleSmall, primary)
+  Section "Import" (labelMedium, primary)
     3x ImportExportItem (bodyLarge + bodySmall)
 ```
 
@@ -196,31 +196,32 @@ Column(fillMaxSize, padding: top=innerPadding+16, bottom=innerPadding, start/end
 
 ```text
 Surface(fillMaxSize)
-  Column(fillMaxSize, verticalScroll, padding: h=32, v=48, center)
-    Title: headlineLarge, bold, center
-    Spacer(8)
-    Tagline: bodyLarge, onSurfaceVariant, center
-    Spacer(40)
-    ConceptCard x3 (Card, Row padding=16, icon 32dp)
-      Title: titleMedium, semibold
-      Description: bodyMedium, onSurfaceVariant
-    Spacer(40)
-    OutlinedButton "Show Help" (fillMaxWidth)
+  Column(fillMaxSize, padding: h=32, v=48)
+    Column(weight=1, verticalScroll, center)
+      Title: headlineLarge, bold, center
+      Spacer(8)
+      Tagline: bodyLarge, onSurfaceVariant, center
+      Spacer(40)
+      ConceptCard x3 (Card, Row padding=16, icon 32dp)
+        Title: titleMedium, semibold
+        Description: bodyMedium, onSurfaceVariant
+    OutlinedButton "Show help" (fillMaxWidth)
     Spacer(12)
-    Button "Get Started" (fillMaxWidth)
+    Button "Get started" (fillMaxWidth)
 ```
 
 ### Help
 
 ```text
 Surface(fillMaxSize)
-  Column(fillMaxSize, verticalScroll, padding: h=24, v=32)
-    Title: headlineMedium, bold
-    Spacer(24)
-    SectionTitle x5: titleMedium, semibold, bottom=4dp
-    HelpText: bodyMedium, onSurfaceVariant, v=2dp
-    BulletItem: bodyMedium, start=8dp, label bold + colored
-    Spacer(32)
+  Column(fillMaxSize, padding: h=24, top=48, bottom=32)
+    Column(weight=1, verticalScroll)
+      Title: headlineMedium, bold
+      Spacer(24)
+      SectionTitle x3: titleMedium, semibold, bottom=4dp
+      HelpText: bodyMedium, onSurfaceVariant, v=2dp
+      BulletItem: bodyMedium, start=8dp, label bold + colored
+    Spacer(16)
     Button "Back" (fillMaxWidth)
 ```
 

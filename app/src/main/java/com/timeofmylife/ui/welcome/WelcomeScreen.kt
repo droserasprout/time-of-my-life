@@ -44,11 +44,16 @@ fun WelcomeScreen(onGetStarted: () -> Unit, onShowHelp: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 32.dp, vertical = 48.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+          Column(
+              modifier = Modifier
+                  .weight(1f)
+                  .verticalScroll(rememberScrollState()),
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.Center
+          ) {
             Text(
                 "Time of My Life",
                 style = MaterialTheme.typography.headlineLarge,
@@ -86,7 +91,7 @@ fun WelcomeScreen(onGetStarted: () -> Unit, onShowHelp: () -> Unit) {
                 accentColor = WorstOrange
             )
 
-            Spacer(Modifier.height(40.dp))
+          }
 
             OutlinedButton(
                 onClick = onShowHelp,
