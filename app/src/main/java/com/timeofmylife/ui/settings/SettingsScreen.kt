@@ -1,113 +1,41 @@
 package com.timeofmylife.ui.settings
 
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.ui.LocalDemoMode
 import com.timeofmylife.ui.LocalSetDemoMode
-import com.timeofmylife.data.json.readBalancesCsv
-import com.timeofmylife.data.json.readBudgetItemsCsv
-import com.timeofmylife.data.json.readImportFromUri
-import com.timeofmylife.data.json.writeBalancesCsv
-import com.timeofmylife.data.json.writeBudgetItemsCsv
-import com.timeofmylife.data.json.writeExportToUri
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
-private fun timestamp(): String =
-    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
 
 @Composable
-fun SettingsScreen(repository: FinanceRepository, innerPadding: PaddingValues, onShowWelcome: () -> Unit, onShowHelp: () -> Unit) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    var showImportConfirm by remember { mutableStateOf<(() -> Unit)?>(null) }
+fun SettingsScreen(
+    repository: FinanceRepository,
+    innerPadding: PaddingValues,
+    onShowWelcome: () -> Unit,
+    onShowHelp: () -> Unit
+) {
+    var showImportExport by remember { mutableStateOf(false) }
 
-    val jsonExportLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument("application/json")
-    ) { uri ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        scope.launch(Dispatchers.IO) {
-            val data = repository.exportData()
-            writeExportToUri(context, uri, data)
-            launch(Dispatchers.Main) { Toast.makeText(context, "JSON exported", Toast.LENGTH_SHORT).show() }
-        }
+    if (showImportExport) {
+        BackHandler { showImportExport = false }
+        ImportExportScreen(repository, innerPadding)
+    } else {
+        SettingsContent(innerPadding, onShowWelcome, onShowHelp, onShowImportExport = { showImportExport = true })
     }
+}
 
-    val jsonImportLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        showImportConfirm = {
-            scope.launch(Dispatchers.IO) {
-                val data = readImportFromUri(context, uri)
-                repository.importData(data)
-                launch(Dispatchers.Main) { Toast.makeText(context, "JSON imported", Toast.LENGTH_SHORT).show() }
-            }
-        }
-    }
-
-    // CSV export launchers
-    val balancesCsvExportLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument("text/csv")
-    ) { uri ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        scope.launch(Dispatchers.IO) {
-            val balances = repository.getAllBalances()
-            writeBalancesCsv(context, uri, balances)
-            launch(Dispatchers.Main) { Toast.makeText(context, "Balances CSV exported", Toast.LENGTH_SHORT).show() }
-        }
-    }
-
-    val budgetCsvExportLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument("text/csv")
-    ) { uri ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        scope.launch(Dispatchers.IO) {
-            val items = repository.getAllBudgetItems()
-            writeBudgetItemsCsv(context, uri, items)
-            launch(Dispatchers.Main) { Toast.makeText(context, "Budget CSV exported", Toast.LENGTH_SHORT).show() }
-        }
-    }
-
-    // CSV import launchers
-    val balancesCsvImportLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        showImportConfirm = {
-            scope.launch(Dispatchers.IO) {
-                val balances = readBalancesCsv(context, uri)
-                repository.importBalances(balances)
-                launch(Dispatchers.Main) { Toast.makeText(context, "Balances CSV imported", Toast.LENGTH_SHORT).show() }
-            }
-        }
-    }
-
-    val budgetCsvImportLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        showImportConfirm = {
-            scope.launch(Dispatchers.IO) {
-                val items = readBudgetItemsCsv(context, uri)
-                repository.importBudgetItems(items)
-                launch(Dispatchers.Main) { Toast.makeText(context, "Budget CSV imported", Toast.LENGTH_SHORT).show() }
-            }
-        }
-    }
-
+@Composable
+private fun SettingsContent(
+    innerPadding: PaddingValues,
+    onShowWelcome: () -> Unit,
+    onShowHelp: () -> Unit,
+    onShowImportExport: () -> Unit
+) {
     val demoMode = LocalDemoMode.current
     val setDemoMode = LocalSetDemoMode.current
 
@@ -136,51 +64,14 @@ fun SettingsScreen(repository: FinanceRepository, innerPadding: PaddingValues, o
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Export", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
-        SettingsItem("Export JSON", "Single file with all data") {
-            jsonExportLauncher.launch("finances_${timestamp()}.json")
-        }
-        SettingsItem("Export balances CSV", "Single CSV file") {
-            balancesCsvExportLauncher.launch("balances_${timestamp()}.csv")
-        }
-        SettingsItem("Export budget CSV", "Single CSV file") {
-            budgetCsvExportLauncher.launch("budget_${timestamp()}.csv")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text("Import", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
-        SettingsItem("Import JSON", "Replace all data from a JSON file") {
-            jsonImportLauncher.launch(arrayOf("application/json", "*/*"))
-        }
-        SettingsItem("Import balances CSV", "Replace balances from a CSV file") {
-            balancesCsvImportLauncher.launch(arrayOf("text/csv", "*/*"))
-        }
-        SettingsItem("Import budget CSV", "Replace budget items from a CSV file") {
-            budgetCsvImportLauncher.launch(arrayOf("text/csv", "*/*"))
-        }
+        Text("Data", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+        SettingsItem("Import / Export", "JSON and CSV backup") { onShowImportExport() }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text("Help", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
-        SettingsItem("Show welcome screen", "View the intro again") {
-            onShowWelcome()
-        }
+        SettingsItem("Show welcome screen", "View the intro again") { onShowWelcome() }
         SettingsItem("Show help", "How the app works") { onShowHelp() }
-    }
-
-    showImportConfirm?.let { onConfirm ->
-        AlertDialog(
-            onDismissRequest = { showImportConfirm = null },
-            title = { Text("Import data?") },
-            text = { Text("This will replace all current data with the contents of the selected file(s).") },
-            confirmButton = {
-                TextButton(onClick = { showImportConfirm = null; onConfirm() }) { Text("Replace") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showImportConfirm = null }) { Text("Cancel") }
-            }
-        )
     }
 }
 
