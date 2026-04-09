@@ -11,7 +11,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import com.timeofmylife.data.FinanceRepository
+import com.timeofmylife.ui.LocalBirthYear
+import com.timeofmylife.ui.LocalSetBirthYear
+import com.timeofmylife.ui.LocalLifeExpectancy
+import com.timeofmylife.ui.LocalSetLifeExpectancy
 import com.timeofmylife.ui.LocalDemoMode
 import com.timeofmylife.ui.LocalSetDemoMode
 import com.timeofmylife.data.json.readCsvFromFolder
@@ -78,6 +84,13 @@ fun SettingsScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
 
     val demoMode = LocalDemoMode.current
     val setDemoMode = LocalSetDemoMode.current
+    val birthYear = LocalBirthYear.current
+    val setBirthYear = LocalSetBirthYear.current
+    val lifeExpectancy = LocalLifeExpectancy.current
+    val setLifeExpectancy = LocalSetLifeExpectancy.current
+
+    var birthYearText by remember { mutableStateOf(if (birthYear > 0) birthYear.toString() else "") }
+    var lifeExpectancyText by remember { mutableStateOf(if (lifeExpectancy > 0) lifeExpectancy.toString() else "") }
 
     Column(
         modifier = Modifier
@@ -89,6 +102,39 @@ fun SettingsScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                 end = 16.dp
             )
     ) {
+        Text("Profile", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            OutlinedTextField(
+                value = birthYearText,
+                onValueChange = { value ->
+                    birthYearText = value
+                    setBirthYear(value.toIntOrNull() ?: 0)
+                },
+                label = { Text("Birth year") },
+                placeholder = { Text("e.g. 1990") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                modifier = Modifier.weight(1f)
+            )
+            OutlinedTextField(
+                value = lifeExpectancyText,
+                onValueChange = { value ->
+                    lifeExpectancyText = value
+                    setLifeExpectancy(value.toIntOrNull() ?: 0)
+                },
+                label = { Text("Life expectancy") },
+                placeholder = { Text("e.g. 80") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text("Display", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
         Row(
             modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),

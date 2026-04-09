@@ -26,11 +26,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.domain.LifetimeRow
+import com.timeofmylife.ui.LocalBirthYear
 import com.timeofmylife.ui.LocalDemoMode
+import com.timeofmylife.ui.LocalLifeExpectancy
 import com.timeofmylife.ui.formatAmount
 import com.timeofmylife.ui.theme.*
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.math.min
+import kotlin.math.max
 
 private val BALANCE_COLUMNS = listOf("Scenario", "1m", "3m", "6m", "12m")
 private val SURVIVAL_COLUMNS = listOf("Scenario", "Time left", "Final Day")
@@ -77,6 +81,9 @@ fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                 modifier = Modifier.padding(start = 8.dp)
             )
         }
+
+        // Coverage bar
+        LifetimeCoverageBar(rows)
 
         // Balance matrix table (horizontal scroll for narrow screens)
         Column(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(16.dp)) {
@@ -234,5 +241,138 @@ private fun Cell(text: String, width: Dp) {
             .width(width)
             .padding(vertical = 8.dp, horizontal = 4.dp)
     )
+}
+
+private data class BarSegments(
+    val lived: Double,
+    val high: Double,
+    val medium: Double,
+    val low: Double,
+    val uncovered: Double,
+    val coveragePercent: Double
+)
+
+private fun computeBarSegments(
+    rows: List<LifetimeRow>,
+    highIdx: Int,
+    medIdx: Int,
+    lowIdx: Int,
+    livedYears: Double,
+    remainingLife: Double,
+    totalLife: Double
+): BarSegments {
+    if (totalLife <= 0 || rows.size < 6) return BarSegments(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+
+    val livedFraction = livedYears / totalLife
+
+    val highMonths = rows[highIdx].monthsLeft
+    val medMonths = rows[medIdx].monthsLeft
+    val lowMonths = rows[lowIdx].monthsLeft
+
+    val highYears = if (highMonths.isInfinite()) remainingLife else min(highMonths / 12.0, remainingLife)
+    val medYearsTotal = if (medMonths.isInfinite()) remainingLife else min(medMonths / 12.0, remainingLife)
+    val lowYearsTotal = if (lowMonths.isInfinite()) remainingLife else min(lowMonths / 12.0, remainingLife)
+
+    val medYears = max(0.0, medYearsTotal - highYears)
+    val lowYears = max(0.0, lowYearsTotal - medYearsTotal)
+    val coveredYears = highYears + medYears + lowYears
+    val uncoveredYears = max(0.0, remainingLife - coveredYears)
+
+    val coveragePercent = if (remainingLife > 0) coveredYears / remainingLife * 100.0 else 100.0
+
+    return BarSegments(
+        lived = livedFraction,
+        high = highYears / totalLife,
+        medium = medYears / totalLife,
+        low = lowYears / totalLife,
+        uncovered = uncoveredYears / totalLife,
+        coveragePercent = min(coveragePercent, 100.0)
+    )
+}
+
+@Composable
+private fun LifetimeCoverageBar(rows: List<LifetimeRow>) {
+    val birthYear = LocalBirthYear.current
+    val lifeExpectancy = LocalLifeExpectancy.current
+
+    if (birthYear <= 0 || lifeExpectancy <= 0) {
+        Text(
+            text = "Set birth year and life expectancy in Settings for coverage estimates",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
+        )
+        return
+    }
+
+    if (rows.size < 6) return
+
+    val currentYear = LocalDate.now().year
+    val livedYears = (currentYear - birthYear).toDouble()
+    val totalLife = lifeExpectancy.toDouble()
+    val remainingLife = max(0.0, totalLife - livedYears)
+
+    val worst = computeBarSegments(rows, 0, 2, 4, livedYears, remainingLife, totalLife)
+    val best = computeBarSegments(rows, 1, 3, 5, livedYears, remainingLife, totalLife)
+
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        SegmentedBar("worst", worst)
+        Spacer(modifier = Modifier.height(4.dp))
+        SegmentedBar("best", best)
+
+        Spacer(modifier = Modifier.height(6.dp))
+
+        val worstPct = "%.1f".format(worst.coveragePercent)
+        val bestPct = "%.1f".format(best.coveragePercent)
+        val label = if (worstPct == bestPct) "You're $worstPct% covered"
+                    else "You're $worstPct% – $bestPct% covered"
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+private fun SegmentedBar(label: String, segments: BarSegments) {
+    val barHeight = 14.dp
+    val shape = MaterialTheme.shapes.small
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = if (label == "worst") WorstOrange else BestBlue,
+            modifier = Modifier.width(40.dp)
+        )
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .height(barHeight)
+                .clip(shape)
+        ) {
+            val parts = listOf(
+                segments.lived to LivedGrey,
+                segments.high to HighColor,
+                segments.medium to MediumColor,
+                segments.low to LowColor,
+                segments.uncovered to UncoveredDark
+            )
+            parts.forEach { (fraction, color) ->
+                if (fraction > 0.001) {
+                    Box(
+                        modifier = Modifier
+                            .weight(fraction.toFloat())
+                            .fillMaxHeight()
+                            .background(color)
+                    )
+                }
+            }
+        }
+    }
 }
 
