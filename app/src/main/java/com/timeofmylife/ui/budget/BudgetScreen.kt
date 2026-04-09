@@ -36,6 +36,7 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     val vm: BudgetViewModel = viewModel(factory = BudgetViewModel.Factory(repository))
     val items by vm.items.collectAsStateWithLifecycle()
     val sortOrder by vm.sortOrder.collectAsStateWithLifecycle()
+    val ascending by vm.ascending.collectAsStateWithLifecycle()
     var showAddDialog by remember { mutableStateOf(false) }
     var editTarget by remember { mutableStateOf<BudgetItem?>(null) }
 
@@ -67,7 +68,13 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                 options = SortOrder.entries.toList(),
                 selected = sortOrder,
                 onSelect = { vm.setSortOrder(it) },
-                label = { it.name.lowercase() }
+                label = { order ->
+                    val arrow = if (order == sortOrder) { if (ascending) " \u25B2" else " \u25BC" } else ""
+                    when (order) {
+                        SortOrder.ALPHA -> "a-z$arrow"
+                        SortOrder.SIZE -> "size$arrow"
+                    }
+                }
             )
 
             LazyColumn(
@@ -160,7 +167,6 @@ private fun TotalsCard(
         }
         TotalsRow("Expenses", expenseGood, expenseBad, expenseLast, ExpenseRed)
         TotalsRow("Income", incomeGood, incomeBad, incomeLast, IncomeGreen)
-        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         TotalsRow("Net", netGood, netBad, netLast, MaterialTheme.colorScheme.onSurface)
         // Single tick bar spanning all 3 columns
         Row(modifier = Modifier.fillMaxWidth()) {
