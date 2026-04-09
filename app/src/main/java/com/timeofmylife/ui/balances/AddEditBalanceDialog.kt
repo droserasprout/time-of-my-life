@@ -28,7 +28,7 @@ fun AddEditBalanceDialog(
         Card(shape = RoundedCornerShape(DialogCornerRadius)) {
             Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
-                    if (initial == null) "Add Balance" else "Edit Balance",
+                    if (initial == null) "Add balance" else "Edit balance",
                     style = MaterialTheme.typography.titleLarge
                 )
                 OutlinedTextField(

@@ -30,7 +30,7 @@ fun AddEditBudgetItemDialog(
         Card(shape = RoundedCornerShape(DialogCornerRadius)) {
             Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
-                    if (initial == null) "Add Budget Item" else "Edit Budget Item",
+                    if (initial == null) "Add budget item" else "Edit budget item",
                     style = MaterialTheme.typography.titleLarge
                 )
                 OutlinedTextField(

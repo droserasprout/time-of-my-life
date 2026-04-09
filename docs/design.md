@@ -224,6 +224,25 @@ Surface(fillMaxSize)
     Button "Back" (fillMaxWidth)
 ```
 
+## Label Casing
+
+| Context | Casing | Examples |
+|---------|--------|----------|
+| Screen/page titles | Sentence case | "Help", "Import / Export" |
+| Section headers | Sentence case | "Display", "Data", "Export" |
+| Column headers | lowercase | "best", "last", "worst", "sum" |
+| Selector options | lowercase | "all", "expense", "a-z", "avg" |
+| Dialog buttons | Sentence case | "Save", "Cancel", "Delete" |
+| Dialog titles | Sentence case | "Add balance", "Edit budget item" |
+| Field labels | Sentence case | "Name", "Best amount (USD)" |
+| Nav bar labels | Sentence case | "Balances", "Budget", "Settings" |
+| Settings items | Sentence case | "Demo mode", "Import / Export" |
+| Buttons | Sentence case | "Get started", "Show help", "Back" |
+| Scenario labels | lowercase | "high / worst", "medium / best" |
+| List section headers | Sentence case | "High", "Medium", "Expenses" |
+
+Column headers use lowercase; everything else uses sentence case.
+
 ## Shared Constants (`Dimensions.kt`)
 
 | Constant | Value | Usage |
@@ -248,4 +267,4 @@ Surface(fillMaxSize)
 | Dialog content padding | 24dp (full edit), 16x12dp (quick edit) |
 | FAB position | BottomEnd, end=16, bottom=innerPadding+16 |
 | Totals panel padding | horizontal=12, vertical=10 |
-| Tick bar height | 8dp (budget only) |
+| Overlay screen padding | h=24-32dp (wider for readability) |

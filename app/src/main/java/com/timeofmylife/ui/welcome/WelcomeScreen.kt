@@ -92,7 +92,7 @@ fun WelcomeScreen(onGetStarted: () -> Unit, onShowHelp: () -> Unit) {
                 onClick = onShowHelp,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Show Help")
+                Text("Show help")
             }
             Spacer(Modifier.height(12.dp))
             Button(
@@ -102,7 +102,7 @@ fun WelcomeScreen(onGetStarted: () -> Unit, onShowHelp: () -> Unit) {
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Get Started")
+                Text("Get started")
             }
         }
     }

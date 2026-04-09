@@ -237,7 +237,7 @@ private fun TickBar(best: Double, worst: Double, last: Double, modifier: Modifie
     val tickColor = LastGrey
     Box(
         modifier = modifier
-            .height(8.dp)
+            .height(BarHeight)
             .drawBehind {
                 drawLine(
                     color = barColor,
