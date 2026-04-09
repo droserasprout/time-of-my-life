@@ -206,8 +206,11 @@ private fun TotalsCard(
         TotalsRow("Expenses", expenseGood, expenseBad, expenseLast, ExpenseRed)
         TotalsRow("Income", incomeGood, incomeBad, incomeLast, IncomeGreen)
         TotalsRow("Net", netGood, netBad, netLast, MaterialTheme.colorScheme.onSurface)
-        // Single tick bar spanning all 3 columns
-        Row(modifier = Modifier.fillMaxWidth()) {
+        // Accuracy bar matching row layout
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Spacer(modifier = Modifier.weight(1f))
             TickBar(good = netGood, bad = netBad, last = netLast, modifier = Modifier.width(AMOUNT_COL_WIDTH * 3))
         }
@@ -244,7 +247,7 @@ private fun TickBar(good: Double, bad: Double, last: Double, modifier: Modifier 
     val tickColor = LastGrey
     Box(
         modifier = modifier
-            .height(4.dp)
+            .height(8.dp)
             .drawBehind {
                 drawLine(
                     color = barColor,

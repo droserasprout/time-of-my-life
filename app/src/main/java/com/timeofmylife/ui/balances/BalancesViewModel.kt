@@ -5,20 +5,30 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.data.model.Balance
-import com.timeofmylife.data.model.Reliability
+import com.timeofmylife.ui.budget.SortOrder
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class BalancesViewModel(private val repo: FinanceRepository) : ViewModel() {
 
-    // Groups balances by reliability in declaration order: HIGH, MEDIUM, LOW
-    val grouped: StateFlow<Map<Reliability, List<Balance>>> = repo.balances
-        .map { list ->
-            Reliability.entries.associateWith { r ->
-                list.filter { it.reliability == r }.sortedBy { it.name }
-            }.filterValues { it.isNotEmpty() }
+    private val _sortOrder = MutableStateFlow(SortOrder.ALPHA)
+    val sortOrder: StateFlow<SortOrder> = _sortOrder.asStateFlow()
+
+    private val _ascending = MutableStateFlow(true)
+    val ascending: StateFlow<Boolean> = _ascending.asStateFlow()
+
+    val items: StateFlow<List<Balance>> = combine(repo.balances, _sortOrder, _ascending) { list, order, asc ->
+        val sorted = when (order) {
+            SortOrder.ALPHA -> list.sortedBy { it.name.lowercase() }
+            SortOrder.SIZE -> list.sortedBy { it.amount }
         }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
+        if (asc) sorted else sorted.reversed()
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun setSortOrder(order: SortOrder) {
+        if (_sortOrder.value == order) _ascending.value = !_ascending.value
+        else { _sortOrder.value = order; _ascending.value = true }
+    }
 
     fun upsert(balance: Balance) = viewModelScope.launch { repo.upsertBalance(balance) }
     fun delete(balance: Balance) = viewModelScope.launch { repo.deleteBalance(balance) }
