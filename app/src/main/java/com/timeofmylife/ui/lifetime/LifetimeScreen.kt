@@ -26,6 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.domain.LifetimeRow
+import androidx.compose.ui.graphics.Brush
 import com.timeofmylife.ui.LocalBirthYear
 import com.timeofmylife.ui.LocalDemoMode
 import com.timeofmylife.ui.LocalLifeExpectancy
@@ -33,6 +34,7 @@ import com.timeofmylife.ui.formatAmount
 import com.timeofmylife.ui.theme.*
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.math.max
 
@@ -244,11 +246,10 @@ private fun Cell(text: String, width: Dp) {
 }
 
 private data class BarSegments(
-    val lived: Double,
-    val high: Double,
-    val medium: Double,
-    val low: Double,
-    val uncovered: Double,
+    val highYears: Double,
+    val medYears: Double,
+    val lowYears: Double,
+    val totalYears: Double,
     val coveragePercent: Double
 )
 
@@ -257,13 +258,9 @@ private fun computeBarSegments(
     highIdx: Int,
     medIdx: Int,
     lowIdx: Int,
-    livedYears: Double,
-    remainingLife: Double,
-    totalLife: Double
+    remainingLife: Double
 ): BarSegments {
-    if (totalLife <= 0 || rows.size < 6) return BarSegments(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-
-    val livedFraction = livedYears / totalLife
+    if (rows.size < 6) return BarSegments(0.0, 0.0, 0.0, 0.0, 0.0)
 
     val highMonths = rows[highIdx].monthsLeft
     val medMonths = rows[medIdx].monthsLeft
@@ -275,19 +272,11 @@ private fun computeBarSegments(
 
     val medYears = max(0.0, medYearsTotal - highYears)
     val lowYears = max(0.0, lowYearsTotal - medYearsTotal)
-    val coveredYears = highYears + medYears + lowYears
-    val uncoveredYears = max(0.0, remainingLife - coveredYears)
+    val totalYears = highYears + medYears + lowYears
 
-    val coveragePercent = if (remainingLife > 0) coveredYears / remainingLife * 100.0 else 100.0
+    val coveragePercent = if (remainingLife > 0) min(totalYears / remainingLife * 100.0, 100.0) else 100.0
 
-    return BarSegments(
-        lived = livedFraction,
-        high = highYears / totalLife,
-        medium = medYears / totalLife,
-        low = lowYears / totalLife,
-        uncovered = uncoveredYears / totalLife,
-        coveragePercent = min(coveragePercent, 100.0)
-    )
+    return BarSegments(highYears, medYears, lowYears, totalYears, coveragePercent)
 }
 
 @Composable
@@ -310,16 +299,25 @@ private fun LifetimeCoverageBar(rows: List<LifetimeRow>) {
 
     val currentYear = LocalDate.now().year
     val livedYears = (currentYear - birthYear).toDouble()
-    val totalLife = lifeExpectancy.toDouble()
-    val remainingLife = max(0.0, totalLife - livedYears)
+    val remainingLife = max(0.0, lifeExpectancy.toDouble() - livedYears)
 
-    val worst = computeBarSegments(rows, 0, 2, 4, livedYears, remainingLife, totalLife)
-    val best = computeBarSegments(rows, 1, 3, 5, livedYears, remainingLife, totalLife)
+    val worst = computeBarSegments(rows, 0, 2, 4, remainingLife)
+    val best = computeBarSegments(rows, 1, 3, 5, remainingLife)
+
+    val maxYears = max(worst.totalYears, best.totalYears).let {
+        if (it <= 0.0) 1.0 else it
+    }
+
+    val surfaceColor = MaterialTheme.colorScheme.background
 
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        SegmentedBar("worst", worst)
+        SegmentedBar("worst", worst, maxYears, surfaceColor)
         Spacer(modifier = Modifier.height(4.dp))
-        SegmentedBar("best", best)
+        SegmentedBar("best", best, maxYears, surfaceColor)
+
+        // Year labels
+        Spacer(modifier = Modifier.height(2.dp))
+        YearLabels(currentYear, maxYears)
 
         Spacer(modifier = Modifier.height(6.dp))
 
@@ -338,9 +336,32 @@ private fun LifetimeCoverageBar(rows: List<LifetimeRow>) {
 }
 
 @Composable
-private fun SegmentedBar(label: String, segments: BarSegments) {
+private fun YearLabels(currentYear: Int, maxYears: Double) {
+    val endYear = currentYear + ceil(maxYears).toInt()
+    val span = endYear - currentYear
+    val step = max(1, (span + 3) / 5) // ~5 labels
+    val years = (currentYear..endYear step step).toList().let {
+        if (it.last() != endYear && span > 1) it + endYear else it
+    }
+
+    Row(modifier = Modifier.padding(start = 40.dp)) {
+        years.forEachIndexed { i, year ->
+            val yearLabel = "'${(year % 100).toString().padStart(2, '0')}"
+            if (i > 0) Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = yearLabel,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun SegmentedBar(label: String, segments: BarSegments, maxYears: Double, surfaceColor: Color) {
     val barHeight = 14.dp
     val shape = MaterialTheme.shapes.small
+    val gradientWidth = 12.dp
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
@@ -349,29 +370,54 @@ private fun SegmentedBar(label: String, segments: BarSegments) {
             color = if (label == "worst") WorstOrange else BestBlue,
             modifier = Modifier.width(40.dp)
         )
-        Row(
+        Box(
             modifier = Modifier
                 .weight(1f)
                 .height(barHeight)
                 .clip(shape)
         ) {
-            val parts = listOf(
-                segments.lived to LivedGrey,
-                segments.high to HighColor,
-                segments.medium to MediumColor,
-                segments.low to LowColor,
-                segments.uncovered to UncoveredDark
-            )
-            parts.forEach { (fraction, color) ->
-                if (fraction > 0.001) {
+            // Bar segments
+            Row(modifier = Modifier.matchParentSize()) {
+                val parts = listOf(
+                    segments.highYears to HighColor,
+                    segments.medYears to MediumColor,
+                    segments.lowYears to LowColor
+                )
+                parts.forEach { (years, color) ->
+                    if (years > 0.001) {
+                        Box(
+                            modifier = Modifier
+                                .weight((years / maxYears).toFloat())
+                                .fillMaxHeight()
+                                .background(color)
+                        )
+                    }
+                }
+                val uncovered = maxYears - segments.totalYears
+                if (uncovered > 0.001) {
                     Box(
                         modifier = Modifier
-                            .weight(fraction.toFloat())
+                            .weight((uncovered / maxYears).toFloat())
                             .fillMaxHeight()
-                            .background(color)
+                            .background(UncoveredDark)
                     )
                 }
             }
+            // Edge gradients
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .width(gradientWidth)
+                    .fillMaxHeight()
+                    .background(Brush.horizontalGradient(listOf(surfaceColor, Color.Transparent)))
+            )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .width(gradientWidth)
+                    .fillMaxHeight()
+                    .background(Brush.horizontalGradient(listOf(Color.Transparent, surfaceColor)))
+            )
         }
     }
 }
