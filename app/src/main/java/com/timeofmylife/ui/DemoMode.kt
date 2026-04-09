@@ -16,7 +16,12 @@ fun persistDemoMode(context: Context, enabled: Boolean) {
     context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(KEY, enabled).apply()
 }
 
-fun formatAmount(amount: Double, demo: Boolean): String =
-    if (demo) "$***"
-    else if (amount >= 0) "\$${amount.toLong()}"
-    else "-\$${(-amount).toLong()}"
+fun formatAmount(amount: Double, demo: Boolean): String {
+    val absValue = if (amount >= 0) amount.toLong() else (-amount).toLong()
+    return if (demo) {
+        val stars = "*".repeat(absValue.toString().length)
+        if (amount >= 0) "\$$stars" else "-\$$stars"
+    } else {
+        if (amount >= 0) "\$$absValue" else "-\$$absValue"
+    }
+}
