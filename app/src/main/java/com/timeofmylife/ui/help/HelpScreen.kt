@@ -26,9 +26,9 @@ fun HelpScreen(onBack: () -> Unit) {
 
             SectionTitle("Balances")
             HelpText("Your assets grouped by reliability:")
-            BulletItem("High", "Bank accounts", HighColor)
-            BulletItem("Medium", "Investments", MediumColor)
-            BulletItem("Low", "Crypto, volatile assets", LowColor)
+            BulletItem("High", "Cash, bank accounts", HighColor)
+            BulletItem("Medium", "Broker accounts", MediumColor)
+            BulletItem("Low", "Crypto, debts", LowColor)
             HelpText("Tap to quick-edit amount. \"Edit\" for full editing or delete.")
             Spacer(Modifier.height(16.dp))
 

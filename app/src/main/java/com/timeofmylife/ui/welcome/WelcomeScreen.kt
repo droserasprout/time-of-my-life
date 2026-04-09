@@ -68,7 +68,7 @@ fun WelcomeScreen(onGetStarted: () -> Unit, onShowHelp: () -> Unit) {
             ConceptCard(
                 icon = Icons.Default.AccountBalance,
                 title = "Balances",
-                description = "Add your assets and rate their reliability: high (bank accounts), medium (investments), or low (volatile assets like crypto).",
+                description = "Add your assets and rate their reliability: high (cash, bank accounts), medium (broker accounts), or low (crypto, debts).",
                 accentColor = HighColor
             )
             Spacer(Modifier.height(16.dp))
