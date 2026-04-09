@@ -2,78 +2,59 @@ package com.timeofmylife.data.json
 
 import android.content.Context
 import android.net.Uri
-import androidx.documentfile.provider.DocumentFile
 import com.timeofmylife.data.model.Balance
 import com.timeofmylife.data.model.BudgetItem
 import com.timeofmylife.data.model.ItemType
 import com.timeofmylife.data.model.Reliability
 
-fun writeCsvToFolder(
-    context: Context,
-    folderUri: Uri,
-    balances: List<Balance>,
-    budgetItems: List<BudgetItem>
-) {
-    val folder = DocumentFile.fromTreeUri(context, folderUri) ?: error("Cannot open folder")
-
-    folder.createFile("text/csv", "balances.csv")?.uri?.let { uri ->
-        context.contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { w ->
-            w.write("name,reliability,amount")
+fun writeBalancesCsv(context: Context, uri: Uri, balances: List<Balance>) {
+    context.contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { w ->
+        w.write("name,reliability,amount")
+        w.newLine()
+        balances.forEach { b ->
+            w.write("${escapeCsv(b.name)},${b.reliability.name},${b.amount}")
             w.newLine()
-            balances.forEach { b ->
-                w.write("${escapeCsv(b.name)},${b.reliability.name},${b.amount}")
-                w.newLine()
-            }
-        }
-    }
-
-    folder.createFile("text/csv", "budget_items.csv")?.uri?.let { uri ->
-        context.contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { w ->
-            w.write("name,type,goodAmount,badAmount,lastAmount")
-            w.newLine()
-            budgetItems.forEach { b ->
-                w.write("${escapeCsv(b.name)},${b.type.name},${b.goodAmount},${b.badAmount},${b.lastAmount}")
-                w.newLine()
-            }
         }
     }
 }
 
-fun readCsvFromFolder(
-    context: Context,
-    folderUri: Uri
-): Pair<List<Balance>, List<BudgetItem>> {
-    val folder = DocumentFile.fromTreeUri(context, folderUri) ?: error("Cannot open folder")
+fun writeBudgetItemsCsv(context: Context, uri: Uri, budgetItems: List<BudgetItem>) {
+    context.contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { w ->
+        w.write("name,type,goodAmount,badAmount,lastAmount")
+        w.newLine()
+        budgetItems.forEach { b ->
+            w.write("${escapeCsv(b.name)},${b.type.name},${b.goodAmount},${b.badAmount},${b.lastAmount}")
+            w.newLine()
+        }
+    }
+}
 
-    val balances = folder.findFile("balances.csv")?.uri?.let { uri ->
-        context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { r ->
-            r.readLines().drop(1).filter { it.isNotBlank() }.map { line ->
-                val cols = parseCsvLine(line)
-                Balance(
-                    name = cols[0],
-                    reliability = Reliability.valueOf(cols[1]),
-                    amount = cols[2].toDouble()
-                )
-            }
+fun readBalancesCsv(context: Context, uri: Uri): List<Balance> {
+    return context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { r ->
+        r.readLines().drop(1).filter { it.isNotBlank() }.map { line ->
+            val cols = parseCsvLine(line)
+            Balance(
+                name = cols[0],
+                reliability = Reliability.valueOf(cols[1]),
+                amount = cols[2].toDouble()
+            )
         }
     } ?: emptyList()
+}
 
-    val budgetItems = folder.findFile("budget_items.csv")?.uri?.let { uri ->
-        context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { r ->
-            r.readLines().drop(1).filter { it.isNotBlank() }.map { line ->
-                val cols = parseCsvLine(line)
-                BudgetItem(
-                    name = cols[0],
-                    type = ItemType.valueOf(cols[1]),
-                    goodAmount = cols[2].toDouble(),
-                    badAmount = cols[3].toDouble(),
-                    lastAmount = cols.getOrElse(4) { "0.0" }.toDouble()
-                )
-            }
+fun readBudgetItemsCsv(context: Context, uri: Uri): List<BudgetItem> {
+    return context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { r ->
+        r.readLines().drop(1).filter { it.isNotBlank() }.map { line ->
+            val cols = parseCsvLine(line)
+            BudgetItem(
+                name = cols[0],
+                type = ItemType.valueOf(cols[1]),
+                goodAmount = cols[2].toDouble(),
+                badAmount = cols[3].toDouble(),
+                lastAmount = cols.getOrElse(4) { "0.0" }.toDouble()
+            )
         }
     } ?: emptyList()
-
-    return balances to budgetItems
 }
 
 private fun escapeCsv(value: String): String =

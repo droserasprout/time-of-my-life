@@ -14,12 +14,19 @@ import androidx.compose.ui.unit.dp
 import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.ui.LocalDemoMode
 import com.timeofmylife.ui.LocalSetDemoMode
-import com.timeofmylife.data.json.readCsvFromFolder
+import com.timeofmylife.data.json.readBalancesCsv
+import com.timeofmylife.data.json.readBudgetItemsCsv
 import com.timeofmylife.data.json.readImportFromUri
-import com.timeofmylife.data.json.writeCsvToFolder
+import com.timeofmylife.data.json.writeBalancesCsv
+import com.timeofmylife.data.json.writeBudgetItemsCsv
 import com.timeofmylife.data.json.writeExportToUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
+private fun timestamp(): String =
+    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
 
 @Composable
 fun SettingsScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
@@ -51,27 +58,52 @@ fun SettingsScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
         }
     }
 
-    val csvExportLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.OpenDocumentTree()
+    // CSV export launchers
+    val balancesCsvExportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("text/csv")
     ) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
         scope.launch(Dispatchers.IO) {
             val balances = repository.getAllBalances()
-            val budgetItems = repository.getAllBudgetItems()
-            writeCsvToFolder(context, uri, balances, budgetItems)
-            launch(Dispatchers.Main) { Toast.makeText(context, "CSV exported", Toast.LENGTH_SHORT).show() }
+            writeBalancesCsv(context, uri, balances)
+            launch(Dispatchers.Main) { Toast.makeText(context, "Balances CSV exported", Toast.LENGTH_SHORT).show() }
         }
     }
 
-    val csvImportLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.OpenDocumentTree()
+    val budgetCsvExportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("text/csv")
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch(Dispatchers.IO) {
+            val items = repository.getAllBudgetItems()
+            writeBudgetItemsCsv(context, uri, items)
+            launch(Dispatchers.Main) { Toast.makeText(context, "Budget CSV exported", Toast.LENGTH_SHORT).show() }
+        }
+    }
+
+    // CSV import launchers
+    val balancesCsvImportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
     ) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
         showImportConfirm = {
             scope.launch(Dispatchers.IO) {
-                val (balances, budgetItems) = readCsvFromFolder(context, uri)
-                repository.importRaw(balances, budgetItems)
-                launch(Dispatchers.Main) { Toast.makeText(context, "CSV imported", Toast.LENGTH_SHORT).show() }
+                val balances = readBalancesCsv(context, uri)
+                repository.importBalances(balances)
+                launch(Dispatchers.Main) { Toast.makeText(context, "Balances CSV imported", Toast.LENGTH_SHORT).show() }
+            }
+        }
+    }
+
+    val budgetCsvImportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        showImportConfirm = {
+            scope.launch(Dispatchers.IO) {
+                val items = readBudgetItemsCsv(context, uri)
+                repository.importBudgetItems(items)
+                launch(Dispatchers.Main) { Toast.makeText(context, "Budget CSV imported", Toast.LENGTH_SHORT).show() }
             }
         }
     }
@@ -106,20 +138,26 @@ fun SettingsScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
 
         Text("Export", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
         SettingsItem("Export JSON", "Single file with all data") {
-            jsonExportLauncher.launch("finances.json")
+            jsonExportLauncher.launch("finances_${timestamp()}.json")
         }
-        SettingsItem("Export CSV", "balances.csv + budget_items.csv to a folder") {
-            csvExportLauncher.launch(null)
+        SettingsItem("Export balances CSV", "Single CSV file") {
+            balancesCsvExportLauncher.launch("balances_${timestamp()}.csv")
+        }
+        SettingsItem("Export budget CSV", "Single CSV file") {
+            budgetCsvExportLauncher.launch("budget_${timestamp()}.csv")
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text("Import", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
         SettingsItem("Import JSON", "Replace all data from a JSON file") {
             jsonImportLauncher.launch(arrayOf("application/json", "*/*"))
         }
-        SettingsItem("Import CSV", "Replace all data from a folder with CSV files") {
-            csvImportLauncher.launch(null)
+        SettingsItem("Import balances CSV", "Replace balances from a CSV file") {
+            balancesCsvImportLauncher.launch(arrayOf("text/csv", "*/*"))
+        }
+        SettingsItem("Import budget CSV", "Replace budget items from a CSV file") {
+            budgetCsvImportLauncher.launch(arrayOf("text/csv", "*/*"))
         }
     }
 

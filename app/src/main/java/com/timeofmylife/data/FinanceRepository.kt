@@ -40,4 +40,14 @@ class FinanceRepository(
         balances.forEach { balanceDao.upsert(it) }
         budgetItems.forEach { budgetItemDao.upsert(it) }
     }
+
+    suspend fun importBalances(balances: List<Balance>) {
+        balanceDao.deleteAll()
+        balances.forEach { balanceDao.upsert(it) }
+    }
+
+    suspend fun importBudgetItems(budgetItems: List<BudgetItem>) {
+        budgetItemDao.deleteAll()
+        budgetItems.forEach { budgetItemDao.upsert(it) }
+    }
 }
