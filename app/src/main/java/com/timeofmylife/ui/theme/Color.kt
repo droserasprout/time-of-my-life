@@ -3,8 +3,9 @@ package com.timeofmylife.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val Purple = Color(0xFF7C4DFF)
-val PurpleContainer = Color(0xFF3D1E99)
-val OnPurple = Color(0xFFFFFFFF)
+val Accent = Color(0xFF9E9E9E)
+val AccentContainer = Color(0xFF424242)
+val OnAccent = Color(0xFFFFFFFF)
 
 val ExpenseRed = Color(0xFFEF5350)
 val IncomeGreen = Color(0xFF66BB6A)

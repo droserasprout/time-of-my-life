@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -128,13 +129,22 @@ private fun BalanceItem(
             }
         }
     ) {
-        Card(
+        val borderColor = reliabilityColor(balance.reliability)
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            tonalElevation = 1.dp,
             modifier = Modifier.fillMaxWidth().clickable(onClick = onTap)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .drawBehind {
+                        drawRect(
+                            color = borderColor,
+                            size = androidx.compose.ui.geometry.Size(4.dp.toPx(), size.height)
+                        )
+                    }
+                    .padding(start = 16.dp, end = 12.dp, top = 12.dp, bottom = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -142,7 +152,7 @@ private fun BalanceItem(
                 Text(
                     formatAmount(balance.amount, LocalDemoMode.current),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = reliabilityColor(balance.reliability)
+                    color = borderColor
                 )
             }
         }

@@ -157,25 +157,25 @@ private fun TotalsCard(
     val netGood = incomeGood - expenseGood
     val netBad = incomeBad - expenseBad
     val netLast = incomeLast - expenseLast
-    Card(modifier = modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
-            // Header row
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Spacer(modifier = Modifier.weight(1f))
-                Text("best", style = MaterialTheme.typography.labelSmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
-                Text("last", style = MaterialTheme.typography.labelSmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
-                Text("worst", style = MaterialTheme.typography.labelSmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
-            }
-            TotalsRow("Expenses", expenseGood, expenseBad, expenseLast, ExpenseRed)
-            TotalsRow("Income", incomeGood, incomeBad, incomeLast, IncomeGreen)
-            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-            TotalsRow("Net", netGood, netBad, netLast, MaterialTheme.colorScheme.onSurface)
-            // Single tick bar spanning all 3 columns
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Spacer(modifier = Modifier.weight(1f))
-                TickBar(good = netGood, bad = netBad, last = netLast, modifier = Modifier.width(AMOUNT_COL_WIDTH * 3))
-            }
+    Column(modifier = modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp)) {
+        // Header row
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Spacer(modifier = Modifier.weight(1f))
+            Text("best", style = MaterialTheme.typography.labelSmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+            Text("last", style = MaterialTheme.typography.labelSmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+            Text("worst", style = MaterialTheme.typography.labelSmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
         }
+        TotalsRow("Expenses", expenseGood, expenseBad, expenseLast, ExpenseRed)
+        TotalsRow("Income", incomeGood, incomeBad, incomeLast, IncomeGreen)
+        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+        TotalsRow("Net", netGood, netBad, netLast, MaterialTheme.colorScheme.onSurface)
+        // Single tick bar spanning all 3 columns
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Spacer(modifier = Modifier.weight(1f))
+            TickBar(good = netGood, bad = netBad, last = netLast, modifier = Modifier.width(AMOUNT_COL_WIDTH * 3))
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        HorizontalDivider(color = LastGrey.copy(alpha = 0.3f))
     }
 }
 

@@ -135,7 +135,7 @@ private fun BudgetModeSelector(selected: BudgetMode, onSelect: (BudgetMode) -> U
                         if (isSelected) Modifier.drawBehind {
                             val strokeWidth = 2.dp.toPx()
                             drawLine(
-                                color = Purple,
+                                color = Accent,
                                 start = Offset(0f, size.height),
                                 end = Offset(size.width, size.height),
                                 strokeWidth = strokeWidth
