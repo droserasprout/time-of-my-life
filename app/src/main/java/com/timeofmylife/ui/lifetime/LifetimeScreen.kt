@@ -77,7 +77,7 @@ fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
             Column(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(16.dp)) {
                 Row {
                     BALANCE_COLUMNS.forEachIndexed { i, col ->
-                        HeaderCell(col, if (i == 0) 120.dp else 70.dp)
+                        HeaderCell(col, if (i == 0) 120.dp else AmountColumnWidth)
                     }
                 }
                 HorizontalDivider()
@@ -173,10 +173,10 @@ private fun BalanceRow(row: LifetimeRow, dotColor: Color) {
         Box(modifier = Modifier.width(120.dp).padding(vertical = 8.dp, horizontal = 4.dp)) {
             ScenarioLabel(row.label, dotColor)
         }
-        Cell(formatAmount(row.balance1m, demo), 70.dp)
-        Cell(formatAmount(row.balance3m, demo), 70.dp)
-        Cell(formatAmount(row.balance6m, demo), 70.dp)
-        Cell(formatAmount(row.balance12m, demo), 70.dp)
+        Cell(formatAmount(row.balance1m, demo), AmountColumnWidth)
+        Cell(formatAmount(row.balance3m, demo), AmountColumnWidth)
+        Cell(formatAmount(row.balance6m, demo), AmountColumnWidth)
+        Cell(formatAmount(row.balance12m, demo), AmountColumnWidth)
     }
 }
 

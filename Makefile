@@ -15,5 +15,8 @@ install:
 test:
 	./gradlew --no-daemon test
 
+lint-docs:
+	markdownlint docs/ --ignore docs/superpowers/
+
 clean:
 	./gradlew --no-daemon clean

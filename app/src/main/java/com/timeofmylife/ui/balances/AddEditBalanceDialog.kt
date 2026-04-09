@@ -3,6 +3,7 @@ package com.timeofmylife.ui.balances
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import com.timeofmylife.ui.theme.DialogCornerRadius
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -24,7 +25,7 @@ fun AddEditBalanceDialog(
     var amountText by remember { mutableStateOf(initial?.amount?.toString() ?: "") }
 
     Dialog(onDismissRequest = onDismiss) {
-        Card(shape = RoundedCornerShape(16.dp)) {
+        Card(shape = RoundedCornerShape(DialogCornerRadius)) {
             Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
                     if (initial == null) "Add Balance" else "Edit Balance",

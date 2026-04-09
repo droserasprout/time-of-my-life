@@ -49,7 +49,7 @@ private fun SettingsContent(
                 end = 16.dp
             )
     ) {
-        Text("Display", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+        Text("Display", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
         Row(
             modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -64,12 +64,12 @@ private fun SettingsContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Data", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+        Text("Data", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
         SettingsItem("Import / Export", "JSON and CSV backup") { onShowImportExport() }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Help", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+        Text("Help", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
         SettingsItem("Show welcome screen", "View the intro again") { onShowWelcome() }
         SettingsItem("Show help", "How the app works") { onShowHelp() }
     }

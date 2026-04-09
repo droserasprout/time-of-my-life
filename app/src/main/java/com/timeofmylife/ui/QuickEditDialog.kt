@@ -14,6 +14,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.timeofmylife.ui.theme.DialogCornerRadius
 
 @Composable
 fun QuickEditDialog(
@@ -36,7 +37,7 @@ fun QuickEditDialog(
     }
 
     Dialog(onDismissRequest = onDismiss) {
-        Card(shape = RoundedCornerShape(16.dp)) {
+        Card(shape = RoundedCornerShape(DialogCornerRadius)) {
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
                 OutlinedTextField(
                     value = field,

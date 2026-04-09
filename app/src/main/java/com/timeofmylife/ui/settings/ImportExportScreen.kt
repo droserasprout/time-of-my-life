@@ -113,7 +113,7 @@ fun ImportExportScreen(repository: FinanceRepository, innerPadding: PaddingValue
                 end = 16.dp
             )
     ) {
-            Text("Export", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+            Text("Export", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
             ImportExportItem("Export JSON", "Single file with all data") {
                 jsonExportLauncher.launch("finances_${timestamp()}.json")
             }
@@ -126,7 +126,7 @@ fun ImportExportScreen(repository: FinanceRepository, innerPadding: PaddingValue
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text("Import", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+            Text("Import", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
             ImportExportItem("Import JSON", "Replace all data from a JSON file") {
                 jsonImportLauncher.launch(arrayOf("application/json", "*/*"))
             }

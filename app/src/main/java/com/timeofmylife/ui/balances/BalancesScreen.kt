@@ -1,7 +1,6 @@
 package com.timeofmylife.ui.balances
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -21,14 +19,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.data.model.Balance
 import com.timeofmylife.data.model.Reliability
+import com.timeofmylife.ui.ItemCard
 import com.timeofmylife.ui.LocalDemoMode
 import com.timeofmylife.ui.SegmentedSelector
 import com.timeofmylife.ui.formatAmount
 import com.timeofmylife.ui.budget.SortOrder
-import com.timeofmylife.ui.theme.HighColor
-import com.timeofmylife.ui.theme.LastGrey
-import com.timeofmylife.ui.theme.LowColor
-import com.timeofmylife.ui.theme.MediumColor
+import com.timeofmylife.ui.theme.*
 
 private fun reliabilityColor(reliability: Reliability): Color = when (reliability) {
     Reliability.HIGH -> HighColor
@@ -79,7 +75,7 @@ fun BalancesScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
             if (items.isNotEmpty()) {
                 TotalsPanel(tierSums, totalAmount, modifier = Modifier.padding(
                     top = innerPadding.calculateTopPadding() + 4.dp,
-                    start = 16.dp, end = 16.dp
+                    start = ScreenHorizontalPadding, end = ScreenHorizontalPadding
                 ))
             }
 
@@ -99,11 +95,11 @@ fun BalancesScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
 
             LazyColumn(
                 contentPadding = PaddingValues(
-                    top = 8.dp,
-                    bottom = innerPadding.calculateBottomPadding() + 80.dp,
-                    start = 16.dp, end = 16.dp
+                    top = ItemSpacing,
+                    bottom = innerPadding.calculateBottomPadding() + FabBottomClearance,
+                    start = ScreenHorizontalPadding, end = ScreenHorizontalPadding
                 ),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(ItemSpacing),
                 modifier = Modifier.fillMaxSize()
             ) {
                 groupedItems.forEach { entry ->
@@ -126,7 +122,7 @@ fun BalancesScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
             onClick = { showAddDialog = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 16.dp, bottom = innerPadding.calculateBottomPadding() + 16.dp)
+                .padding(end = ScreenHorizontalPadding, bottom = innerPadding.calculateBottomPadding() + ScreenHorizontalPadding)
         ) {
             Icon(Icons.Default.Add, contentDescription = "Add balance")
         }
@@ -164,8 +160,9 @@ private fun TotalsPanel(
         // Header row
         Row(modifier = Modifier.fillMaxWidth()) {
             Spacer(modifier = Modifier.weight(1f))
-            Text("sum", style = MaterialTheme.typography.labelSmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
-            Text("%", style = MaterialTheme.typography.labelSmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(PCT_COL_WIDTH))
+            val headerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            Text("sum", style = MaterialTheme.typography.labelSmall, color = headerColor, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+            Text("%", style = MaterialTheme.typography.labelSmall, color = headerColor, textAlign = TextAlign.End, modifier = Modifier.width(PCT_COL_WIDTH))
         }
         Reliability.entries.forEach { r ->
             val sum = tierSums[r] ?: 0.0
@@ -179,12 +176,12 @@ private fun TotalsPanel(
                 Text("%.1f".format(pct), style = MaterialTheme.typography.bodySmall, color = reliabilityColor(r), textAlign = TextAlign.End, modifier = Modifier.width(PCT_COL_WIDTH))
             }
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(ItemSpacing))
         // Proportion bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(14.dp)
+                .height(BarHeight)
                 .clip(MaterialTheme.shapes.small)
         ) {
             Reliability.entries.forEach { r ->
@@ -218,30 +215,12 @@ private fun BalanceItem(
     onTap: () -> Unit
 ) {
     val borderColor = reliabilityColor(balance.reliability)
-    Surface(
-        shape = MaterialTheme.shapes.medium,
-        tonalElevation = 1.dp,
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onTap)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .drawBehind {
-                    drawRect(
-                        color = borderColor,
-                        size = androidx.compose.ui.geometry.Size(4.dp.toPx(), size.height)
-                    )
-                }
-                .padding(start = 16.dp, end = 12.dp, top = 10.dp, bottom = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(balance.name, style = MaterialTheme.typography.bodyLarge)
-            Text(
-                formatAmount(balance.amount, LocalDemoMode.current),
-                style = MaterialTheme.typography.bodyLarge,
-                color = borderColor
-            )
-        }
+    ItemCard(borderColor = borderColor, onClick = onTap) {
+        Text(balance.name, style = MaterialTheme.typography.bodyLarge)
+        Text(
+            formatAmount(balance.amount, LocalDemoMode.current),
+            style = MaterialTheme.typography.bodyLarge,
+            color = borderColor
+        )
     }
 }
