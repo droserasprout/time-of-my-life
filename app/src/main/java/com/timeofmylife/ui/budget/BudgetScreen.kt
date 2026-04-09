@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -22,6 +21,7 @@ import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.data.model.BudgetItem
 import com.timeofmylife.data.model.ItemType
 import com.timeofmylife.ui.LocalDemoMode
+import com.timeofmylife.ui.SegmentedSelector
 import com.timeofmylife.ui.formatAmount
 import com.timeofmylife.ui.theme.BestBlue
 import com.timeofmylife.ui.theme.ExpenseRed
@@ -50,32 +50,25 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Sort row
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = innerPadding.calculateTopPadding() + 4.dp, start = 16.dp, end = 4.dp),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = if (sortOrder == SortOrder.ALPHA) "A–Z" else "Size",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                IconButton(onClick = { vm.toggleSort() }) {
-                    Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = "Toggle sort order")
-                }
-            }
-
-            // Totals pinned below sort row
+            // Totals pinned at top
             if (items.isNotEmpty()) {
                 TotalsCard(
                     expenseGood, expenseBad, expenseLast,
                     incomeGood, incomeBad, incomeLast,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                    modifier = Modifier.padding(
+                        top = innerPadding.calculateTopPadding() + 4.dp,
+                        start = 16.dp, end = 16.dp
+                    )
                 )
             }
+
+            // Sort selector below separator
+            SegmentedSelector(
+                options = SortOrder.entries.toList(),
+                selected = sortOrder,
+                onSelect = { vm.setSortOrder(it) },
+                label = { it.name.lowercase() }
+            )
 
             LazyColumn(
                 contentPadding = PaddingValues(

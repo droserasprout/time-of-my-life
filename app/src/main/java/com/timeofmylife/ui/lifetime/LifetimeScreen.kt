@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.clickable
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -15,8 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
+import com.timeofmylife.ui.SegmentedSelector
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -68,7 +66,12 @@ fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                 .verticalScroll(rememberScrollState())
         ) {
             // Budget mode selector
-            BudgetModeSelector(budgetMode) { vm.setBudgetMode(it) }
+            SegmentedSelector(
+                options = BudgetMode.entries.toList(),
+                selected = budgetMode,
+                onSelect = { vm.setBudgetMode(it) },
+                label = { it.name.lowercase() }
+            )
 
             // Balance matrix table (horizontal scroll for narrow screens)
             Column(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(16.dp)) {
@@ -105,48 +108,6 @@ fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     }
 }
 
-@Composable
-private fun BudgetModeSelector(selected: BudgetMode, onSelect: (BudgetMode) -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        BudgetMode.entries.forEachIndexed { index, mode ->
-            if (index > 0) {
-                Text(
-                    "|",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                )
-            }
-            val isSelected = mode == selected
-            Text(
-                text = mode.name.lowercase(),
-                style = MaterialTheme.typography.labelMedium,
-                color = if (isSelected) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .clickable { onSelect(mode) }
-                    .then(
-                        if (isSelected) Modifier.drawBehind {
-                            val strokeWidth = 2.dp.toPx()
-                            drawLine(
-                                color = Accent,
-                                start = Offset(0f, size.height),
-                                end = Offset(size.width, size.height),
-                                strokeWidth = strokeWidth
-                            )
-                        } else Modifier
-                    )
-                    .padding(vertical = 4.dp, horizontal = 2.dp)
-            )
-        }
-    }
-}
 
 @Composable
 private fun RowScope.SurvivalHeaderCell(text: String, isLabel: Boolean = false) {

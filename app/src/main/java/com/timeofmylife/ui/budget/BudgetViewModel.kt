@@ -30,9 +30,7 @@ class BudgetViewModel(private val repo: FinanceRepository) : ViewModel() {
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    fun toggleSort() {
-        _sortOrder.value = if (_sortOrder.value == SortOrder.ALPHA) SortOrder.SIZE else SortOrder.ALPHA
-    }
+    fun setSortOrder(order: SortOrder) { _sortOrder.value = order }
 
     fun upsert(item: BudgetItem) = viewModelScope.launch { repo.upsertBudgetItem(item) }
     fun delete(item: BudgetItem) = viewModelScope.launch { repo.deleteBudgetItem(item) }
