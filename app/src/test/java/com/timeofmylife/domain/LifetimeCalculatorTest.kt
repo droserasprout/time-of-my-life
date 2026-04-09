@@ -12,9 +12,9 @@ class LifetimeCalculatorTest {
         Balance(name = "Crypto", reliability = Reliability.LOW, amount = 1000.0),
     )
     private val budgetItems = listOf(
-        BudgetItem(name = "Food", type = ItemType.EXPENSE, goodAmount = 100.0, badAmount = 250.0),
-        BudgetItem(name = "Rent", type = ItemType.EXPENSE, goodAmount = 200.0, badAmount = 300.0),
-        BudgetItem(name = "Salary", type = ItemType.INCOME, goodAmount = 600.0, badAmount = 375.0),
+        BudgetItem(name = "Food", type = ItemType.EXPENSE, bestAmount = 100.0, worstAmount = 250.0),
+        BudgetItem(name = "Rent", type = ItemType.EXPENSE, bestAmount = 200.0, worstAmount = 300.0),
+        BudgetItem(name = "Salary", type = ItemType.INCOME, bestAmount = 600.0, worstAmount = 375.0),
     )
 
     @Test

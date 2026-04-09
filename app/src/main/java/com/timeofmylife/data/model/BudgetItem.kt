@@ -10,7 +10,7 @@ data class BudgetItem(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
     val type: ItemType,
-    val goodAmount: Double,
-    val badAmount: Double,
+    val bestAmount: Double,
+    val worstAmount: Double,
     val lastAmount: Double = 0.0
 )

@@ -21,8 +21,8 @@ fun AddEditBudgetItemDialog(
 ) {
     var name by remember { mutableStateOf(initial?.name ?: "") }
     var type by remember { mutableStateOf(initial?.type ?: ItemType.EXPENSE) }
-    var goodText by remember { mutableStateOf(initial?.goodAmount?.toString() ?: "") }
-    var badText by remember { mutableStateOf(initial?.badAmount?.toString() ?: "") }
+    var bestText by remember { mutableStateOf(initial?.bestAmount?.toString() ?: "") }
+    var worstText by remember { mutableStateOf(initial?.worstAmount?.toString() ?: "") }
     var lastText by remember { mutableStateOf(initial?.lastAmount?.let { if (it == 0.0) "" else it.toString() } ?: "") }
 
     Dialog(onDismissRequest = onDismiss) {
@@ -50,16 +50,16 @@ fun AddEditBudgetItemDialog(
                     }
                 }
                 OutlinedTextField(
-                    value = goodText,
-                    onValueChange = { goodText = it },
+                    value = bestText,
+                    onValueChange = { bestText = it },
                     label = { Text("Best amount (USD)") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true
                 )
                 OutlinedTextField(
-                    value = badText,
-                    onValueChange = { badText = it },
+                    value = worstText,
+                    onValueChange = { worstText = it },
                     label = { Text("Worst amount (USD)") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -90,11 +90,11 @@ fun AddEditBudgetItemDialog(
                         TextButton(onClick = onDismiss) { Text("Cancel") }
                         TextButton(
                             onClick = {
-                                val good = goodText.toDoubleOrNull() ?: return@TextButton
-                                val bad = badText.toDoubleOrNull() ?: return@TextButton
+                                val good = bestText.toDoubleOrNull() ?: return@TextButton
+                                val bad = worstText.toDoubleOrNull() ?: return@TextButton
                                 if (name.isBlank()) return@TextButton
                                 val last = lastText.toDoubleOrNull() ?: 0.0
-                                onConfirm(BudgetItem(id = initial?.id ?: 0, name = name.trim(), type = type, goodAmount = good, badAmount = bad, lastAmount = last))
+                                onConfirm(BudgetItem(id = initial?.id ?: 0, name = name.trim(), type = type, bestAmount = good, worstAmount = bad, lastAmount = last))
                             }
                         ) { Text("Save") }
                     }

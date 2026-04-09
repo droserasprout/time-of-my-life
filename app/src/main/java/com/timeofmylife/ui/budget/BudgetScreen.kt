@@ -46,11 +46,11 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
 
     val expenses = remember(items) { items.filter { it.type == ItemType.EXPENSE } }
     val incomes = remember(items) { items.filter { it.type == ItemType.INCOME } }
-    val expenseGood = remember(expenses) { expenses.sumOf { it.goodAmount } }
-    val expenseBad = remember(expenses) { expenses.sumOf { it.badAmount } }
+    val expenseBest = remember(expenses) { expenses.sumOf { it.bestAmount } }
+    val expenseWorst = remember(expenses) { expenses.sumOf { it.worstAmount } }
     val expenseLast = remember(expenses) { expenses.sumOf { it.lastAmount } }
-    val incomeGood = remember(incomes) { incomes.sumOf { it.goodAmount } }
-    val incomeBad = remember(incomes) { incomes.sumOf { it.badAmount } }
+    val incomeBest = remember(incomes) { incomes.sumOf { it.bestAmount } }
+    val incomeWorst = remember(incomes) { incomes.sumOf { it.worstAmount } }
     val incomeLast = remember(incomes) { incomes.sumOf { it.lastAmount } }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -58,8 +58,8 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
             // Totals pinned at top
             if (items.isNotEmpty()) {
                 TotalsCard(
-                    expenseGood, expenseBad, expenseLast,
-                    incomeGood, incomeBad, incomeLast,
+                    expenseBest, expenseWorst, expenseLast,
+                    incomeBest, incomeWorst, incomeLast,
                     modifier = Modifier.padding(
                         top = innerPadding.calculateTopPadding() + 4.dp,
                         start = 16.dp, end = 16.dp
@@ -146,18 +146,18 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
             BudgetColumn.WORST -> "worst"
         }
         val initialValue = when (column) {
-            BudgetColumn.BEST -> target.goodAmount
+            BudgetColumn.BEST -> target.bestAmount
             BudgetColumn.LAST -> target.lastAmount
-            BudgetColumn.WORST -> target.badAmount
+            BudgetColumn.WORST -> target.worstAmount
         }
         QuickEditDialog(
             title = "${target.name} | $columnLabel",
             initialValue = if (initialValue == 0.0) "" else initialValue.toString(),
             onSave = { amount ->
                 val updated = when (column) {
-                    BudgetColumn.BEST -> target.copy(goodAmount = amount)
+                    BudgetColumn.BEST -> target.copy(bestAmount = amount)
                     BudgetColumn.LAST -> target.copy(lastAmount = amount)
-                    BudgetColumn.WORST -> target.copy(badAmount = amount)
+                    BudgetColumn.WORST -> target.copy(worstAmount = amount)
                 }
                 vm.upsert(updated); quickEditTarget = null
             },
@@ -179,16 +179,16 @@ private fun SectionHeader(label: String, color: Color) {
 
 @Composable
 private fun TotalsCard(
-    expenseGood: Double,
-    expenseBad: Double,
+    expenseBest: Double,
+    expenseWorst: Double,
     expenseLast: Double,
-    incomeGood: Double,
-    incomeBad: Double,
+    incomeBest: Double,
+    incomeWorst: Double,
     incomeLast: Double,
     modifier: Modifier = Modifier
 ) {
-    val netGood = incomeGood - expenseGood
-    val netBad = incomeBad - expenseBad
+    val netBest = incomeBest - expenseBest
+    val netWorst = incomeWorst - expenseWorst
     val netLast = incomeLast - expenseLast
     Column(modifier = modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp)) {
         // Header row
@@ -198,16 +198,16 @@ private fun TotalsCard(
             Text("last", style = MaterialTheme.typography.labelSmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
             Text("worst", style = MaterialTheme.typography.labelSmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
         }
-        TotalsRow("Expenses", expenseGood, expenseBad, expenseLast, ExpenseRed)
-        TotalsRow("Income", incomeGood, incomeBad, incomeLast, IncomeGreen)
-        TotalsRow("Net", netGood, netBad, netLast, MaterialTheme.colorScheme.onSurface)
+        TotalsRow("Expenses", expenseBest, expenseWorst, expenseLast, ExpenseRed)
+        TotalsRow("Income", incomeBest, incomeWorst, incomeLast, IncomeGreen)
+        TotalsRow("Net", netBest, netWorst, netLast, MaterialTheme.colorScheme.onSurface)
         // Accuracy bar matching row layout
         Row(
             modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.weight(1f))
-            TickBar(good = netGood, bad = netBad, last = netLast, modifier = Modifier.width(AMOUNT_COL_WIDTH * 3))
+            TickBar(best = netBest, worst = netWorst, last = netLast, modifier = Modifier.width(AMOUNT_COL_WIDTH * 3))
         }
         Spacer(modifier = Modifier.height(8.dp))
     }
@@ -216,8 +216,8 @@ private fun TotalsCard(
 @Composable
 private fun TotalsRow(
     label: String,
-    good: Double,
-    bad: Double,
+    best: Double,
+    worst: Double,
     last: Double,
     labelColor: Color,
 ) {
@@ -227,16 +227,16 @@ private fun TotalsRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(label, style = MaterialTheme.typography.bodyMedium, color = labelColor, modifier = Modifier.weight(1f))
-        Text(formatAmount(good, demo), style = MaterialTheme.typography.bodySmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+        Text(formatAmount(best, demo), style = MaterialTheme.typography.bodySmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
         Text(formatAmount(last, demo), style = MaterialTheme.typography.bodySmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
-        Text(formatAmount(bad, demo), style = MaterialTheme.typography.bodySmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
+        Text(formatAmount(worst, demo), style = MaterialTheme.typography.bodySmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH))
     }
 }
 
 @Composable
-private fun TickBar(good: Double, bad: Double, last: Double, modifier: Modifier = Modifier) {
-    val range = bad - good
-    val fraction = if (range != 0.0) ((last - good) / range).toFloat().coerceIn(0f, 1f) else 0.5f
+private fun TickBar(best: Double, worst: Double, last: Double, modifier: Modifier = Modifier) {
+    val range = worst - best
+    val fraction = if (range != 0.0) ((last - best) / range).toFloat().coerceIn(0f, 1f) else 0.5f
     val barColor = LastGrey.copy(alpha = 0.3f)
     val tickColor = LastGrey
     Box(
@@ -285,9 +285,9 @@ private fun BudgetItemRow(item: BudgetItem, onColumnClick: (BudgetColumn) -> Uni
             val demo = LocalDemoMode.current
             Text(item.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f).clickable(onClick = onNameClick))
             Row {
-                Text(formatAmount(item.goodAmount, demo), style = MaterialTheme.typography.bodySmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH).clickable { onColumnClick(BudgetColumn.BEST) })
+                Text(formatAmount(item.bestAmount, demo), style = MaterialTheme.typography.bodySmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH).clickable { onColumnClick(BudgetColumn.BEST) })
                 Text(formatAmount(item.lastAmount, demo), style = MaterialTheme.typography.bodySmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH).clickable { onColumnClick(BudgetColumn.LAST) })
-                Text(formatAmount(item.badAmount, demo), style = MaterialTheme.typography.bodySmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH).clickable { onColumnClick(BudgetColumn.WORST) })
+                Text(formatAmount(item.worstAmount, demo), style = MaterialTheme.typography.bodySmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AMOUNT_COL_WIDTH).clickable { onColumnClick(BudgetColumn.WORST) })
             }
         }
     }

@@ -92,7 +92,7 @@ fun BalancesScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                     val arrow = if (order == sortOrder) { if (ascending) " \u25B2" else " \u25BC" } else ""
                     when (order) {
                         SortOrder.ALPHA -> "a-z$arrow"
-                        else -> "size$arrow"
+                        else -> "amount$arrow"
                     }
                 }
             )

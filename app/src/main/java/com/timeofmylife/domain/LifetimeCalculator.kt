@@ -15,7 +15,7 @@ object LifetimeCalculator {
 
     private data class ScenarioDef(
         val tiers: Set<Reliability>,
-        val useGood: Boolean,
+        val useBest: Boolean,
         val label: String
     )
 
@@ -36,12 +36,12 @@ object LifetimeCalculator {
 
             val totalExpenses = if (includeExpenses) budgetItems
                 .filter { it.type == ItemType.EXPENSE }
-                .sumOf { if (scenario.useGood) it.goodAmount else it.badAmount }
+                .sumOf { if (scenario.useBest) it.bestAmount else it.worstAmount }
             else 0.0
 
             val totalIncomes = if (includeIncome) budgetItems
                 .filter { it.type == ItemType.INCOME }
-                .sumOf { if (scenario.useGood) it.goodAmount else it.badAmount }
+                .sumOf { if (scenario.useBest) it.bestAmount else it.worstAmount }
             else 0.0
 
             val netBurn = totalExpenses - totalIncomes

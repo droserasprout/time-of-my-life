@@ -29,7 +29,7 @@ class BudgetViewModel(private val repo: FinanceRepository) : ViewModel() {
     val items: StateFlow<List<BudgetItem>> = combine(rawItems, _sortOrder, _ascending) { list, order, asc ->
         val sorted = when (order) {
             SortOrder.ALPHA -> list.sortedBy { it.name.lowercase() }
-            SortOrder.AVG -> list.sortedBy { (it.goodAmount + it.badAmount) / 2.0 }
+            SortOrder.AVG -> list.sortedBy { (it.bestAmount + it.worstAmount) / 2.0 }
             SortOrder.LAST -> list.sortedBy { it.lastAmount }
         }
         if (asc) sorted else sorted.reversed()

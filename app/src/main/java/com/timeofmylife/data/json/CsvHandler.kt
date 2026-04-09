@@ -20,10 +20,10 @@ fun writeBalancesCsv(context: Context, uri: Uri, balances: List<Balance>) {
 
 fun writeBudgetItemsCsv(context: Context, uri: Uri, budgetItems: List<BudgetItem>) {
     context.contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { w ->
-        w.write("name,type,goodAmount,badAmount,lastAmount")
+        w.write("name,type,bestAmount,worstAmount,lastAmount")
         w.newLine()
         budgetItems.forEach { b ->
-            w.write("${escapeCsv(b.name)},${b.type.name},${b.goodAmount},${b.badAmount},${b.lastAmount}")
+            w.write("${escapeCsv(b.name)},${b.type.name},${b.bestAmount},${b.worstAmount},${b.lastAmount}")
             w.newLine()
         }
     }
@@ -49,8 +49,8 @@ fun readBudgetItemsCsv(context: Context, uri: Uri): List<BudgetItem> {
             BudgetItem(
                 name = cols[0],
                 type = ItemType.valueOf(cols[1]),
-                goodAmount = cols[2].toDouble(),
-                badAmount = cols[3].toDouble(),
+                bestAmount = cols[2].toDouble(),
+                worstAmount = cols[3].toDouble(),
                 lastAmount = cols.getOrElse(4) { "0.0" }.toDouble()
             )
         }
