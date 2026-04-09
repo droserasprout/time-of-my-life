@@ -17,7 +17,6 @@ val HighColor = Color(0xFFA5D6A7)     // green text for HIGH
 val MediumColor = Color(0xFFFFCC80)   // orange text for MEDIUM
 val LowColor = Color(0xFFEF9A9A)      // red text for LOW
 
-val LivedGrey = Color(0xFF616161)
 val UncoveredDark = Color(0xFF2A2A2A)
 
 // Lifetime matrix row backgrounds (worst → best, 25% alpha on dark bg)

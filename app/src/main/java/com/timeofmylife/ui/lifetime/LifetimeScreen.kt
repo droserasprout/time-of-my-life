@@ -28,16 +28,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.domain.LifetimeRow
-import androidx.compose.ui.graphics.Brush
-import com.timeofmylife.ui.LocalBirthYear
 import com.timeofmylife.ui.LocalDemoMode
-import com.timeofmylife.ui.LocalLifeExpectancy
 import com.timeofmylife.ui.formatAmount
 import com.timeofmylife.ui.theme.*
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.ceil
-import kotlin.math.min
 import kotlin.math.max
 
 private val BALANCE_COLUMNS = listOf("Scenario", "1m", "3m", "6m", "12m")
@@ -281,88 +277,71 @@ private data class BarSegments(
     val medYears: Double,
     val lowYears: Double,
     val totalYears: Double,
-    val coveragePercent: Double
+    val isInfinite: Boolean
 )
 
 private fun computeBarSegments(
     rows: List<LifetimeRow>,
     highIdx: Int,
     medIdx: Int,
-    lowIdx: Int,
-    remainingLife: Double
+    lowIdx: Int
 ): BarSegments {
-    if (rows.size < 6) return BarSegments(0.0, 0.0, 0.0, 0.0, 0.0)
+    if (rows.size < 6) return BarSegments(0.0, 0.0, 0.0, 0.0, false)
 
     val highMonths = rows[highIdx].monthsLeft
     val medMonths = rows[medIdx].monthsLeft
     val lowMonths = rows[lowIdx].monthsLeft
 
-    val highYears = if (highMonths.isInfinite()) remainingLife else min(highMonths / 12.0, remainingLife)
-    val medYearsTotal = if (medMonths.isInfinite()) remainingLife else min(medMonths / 12.0, remainingLife)
-    val lowYearsTotal = if (lowMonths.isInfinite()) remainingLife else min(lowMonths / 12.0, remainingLife)
+    if (highMonths.isInfinite()) return BarSegments(0.0, 0.0, 0.0, 0.0, true)
+
+    val highYears = highMonths / 12.0
+    val medYearsTotal = if (medMonths.isInfinite()) highYears else medMonths / 12.0
+    val lowYearsTotal = if (lowMonths.isInfinite()) medYearsTotal else lowMonths / 12.0
 
     val medYears = max(0.0, medYearsTotal - highYears)
     val lowYears = max(0.0, lowYearsTotal - medYearsTotal)
     val totalYears = highYears + medYears + lowYears
 
-    val coveragePercent = if (remainingLife > 0) min(totalYears / remainingLife * 100.0, 100.0) else 100.0
-
-    return BarSegments(highYears, medYears, lowYears, totalYears, coveragePercent)
+    return BarSegments(highYears, medYears, lowYears, totalYears, false)
 }
 
 @Composable
 private fun LifetimeCoverageBar(rows: List<LifetimeRow>) {
-    val birthYear = LocalBirthYear.current
-    val lifeExpectancy = LocalLifeExpectancy.current
-
-    if (birthYear <= 0 || lifeExpectancy <= 0) {
-        Text(
-            text = "Set birth year and life expectancy in Settings for coverage estimates",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
-        )
-        return
-    }
-
     if (rows.size < 6) return
 
     val currentYear = LocalDate.now().year
-    val livedYears = (currentYear - birthYear).toDouble()
-    val remainingLife = max(0.0, lifeExpectancy.toDouble() - livedYears)
 
-    val worst = computeBarSegments(rows, 0, 2, 4, remainingLife)
-    val best = computeBarSegments(rows, 1, 3, 5, remainingLife)
+    val worst = computeBarSegments(rows, 0, 2, 4)
+    val best = computeBarSegments(rows, 1, 3, 5)
 
-    val maxYears = max(worst.totalYears, best.totalYears).let {
-        if (it <= 0.0) 1.0 else it
+    val bothInfinite = worst.isInfinite && best.isInfinite
+    val maxYears = when {
+        bothInfinite -> 1.0
+        worst.isInfinite -> best.totalYears.coerceAtLeast(1.0)
+        best.isInfinite -> worst.totalYears.coerceAtLeast(1.0)
+        else -> max(worst.totalYears, best.totalYears).coerceAtLeast(1.0)
     }
 
-    val surfaceColor = MaterialTheme.colorScheme.background
-
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        // Year labels above bars
-        YearLabels(currentYear, maxYears)
+        // Year labels or infinity
+        if (bothInfinite) {
+            Text(
+                text = "∞",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(start = 40.dp)
+            )
+        } else {
+            YearLabels(currentYear, maxYears)
+        }
         Spacer(modifier = Modifier.height(2.dp))
 
-        SegmentedBar("worst", worst, maxYears, surfaceColor)
+        SegmentedBar("worst", worst, maxYears)
         Spacer(modifier = Modifier.height(4.dp))
-        SegmentedBar("best", best, maxYears, surfaceColor)
+        SegmentedBar("best", best, maxYears)
 
         Spacer(modifier = Modifier.height(6.dp))
-
-        val worstPct = "%.1f".format(worst.coveragePercent)
-        val bestPct = "%.1f".format(best.coveragePercent)
-        val label = if (worstPct == bestPct) "You're $worstPct% covered"
-                    else "You're $worstPct% – $bestPct% covered"
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
     }
 }
 
@@ -389,10 +368,9 @@ private fun YearLabels(currentYear: Int, maxYears: Double) {
 }
 
 @Composable
-private fun SegmentedBar(label: String, segments: BarSegments, maxYears: Double, surfaceColor: Color) {
+private fun SegmentedBar(label: String, segments: BarSegments, maxYears: Double) {
     val barHeight = 14.dp
     val shape = MaterialTheme.shapes.small
-    val gradientWidth = 12.dp
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
@@ -406,49 +384,31 @@ private fun SegmentedBar(label: String, segments: BarSegments, maxYears: Double,
                 .weight(1f)
                 .height(barHeight)
                 .clip(shape)
+                .background(if (segments.isInfinite) HighColor else UncoveredDark)
         ) {
-            // Bar segments
-            Row(modifier = Modifier.matchParentSize()) {
-                val parts = listOf(
-                    segments.highYears to HighColor,
-                    segments.medYears to MediumColor,
-                    segments.lowYears to LowColor
-                )
-                parts.forEach { (years, color) ->
-                    if (years > 0.001) {
-                        Box(
-                            modifier = Modifier
-                                .weight((years / maxYears).toFloat())
-                                .fillMaxHeight()
-                                .background(color)
-                        )
+            if (!segments.isInfinite) {
+                Row(modifier = Modifier.matchParentSize()) {
+                    val parts = listOf(
+                        segments.highYears to HighColor,
+                        segments.medYears to MediumColor,
+                        segments.lowYears to LowColor
+                    )
+                    parts.forEach { (years, color) ->
+                        if (years > 0.001) {
+                            Box(
+                                modifier = Modifier
+                                    .weight((years / maxYears).toFloat())
+                                    .fillMaxHeight()
+                                    .background(color)
+                            )
+                        }
+                    }
+                    val uncovered = maxYears - segments.totalYears
+                    if (uncovered > 0.001) {
+                        Spacer(modifier = Modifier.weight((uncovered / maxYears).toFloat()))
                     }
                 }
-                val uncovered = maxYears - segments.totalYears
-                if (uncovered > 0.001) {
-                    Box(
-                        modifier = Modifier
-                            .weight((uncovered / maxYears).toFloat())
-                            .fillMaxHeight()
-                            .background(UncoveredDark)
-                    )
-                }
             }
-            // Edge gradients (look weird)
-            // Box(
-            //     modifier = Modifier
-            //         .align(Alignment.CenterStart)
-            //         .width(gradientWidth)
-            //         .fillMaxHeight()
-            //         .background(Brush.horizontalGradient(listOf(surfaceColor, Color.Transparent)))
-            // )
-            // Box(
-            //     modifier = Modifier
-            //         .align(Alignment.CenterEnd)
-            //         .width(gradientWidth)
-            //         .fillMaxHeight()
-            //         .background(Brush.horizontalGradient(listOf(Color.Transparent, surfaceColor)))
-            // )
         }
     }
 }
