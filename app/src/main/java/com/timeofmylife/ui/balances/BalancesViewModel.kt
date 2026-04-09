@@ -20,7 +20,7 @@ class BalancesViewModel(private val repo: FinanceRepository) : ViewModel() {
     val items: StateFlow<List<Balance>> = combine(repo.balances, _sortOrder, _ascending) { list, order, asc ->
         val sorted = when (order) {
             SortOrder.ALPHA -> list.sortedBy { it.name.lowercase() }
-            SortOrder.SIZE -> list.sortedBy { it.amount }
+            SortOrder.AVG, SortOrder.LAST -> list.sortedBy { it.amount }
         }
         if (asc) sorted else sorted.reversed()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())

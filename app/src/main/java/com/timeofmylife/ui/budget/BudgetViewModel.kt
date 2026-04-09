@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-enum class SortOrder { ALPHA, SIZE }
+enum class SortOrder { ALPHA, AVG, LAST }
 
 class BudgetViewModel(private val repo: FinanceRepository) : ViewModel() {
 
@@ -29,7 +29,8 @@ class BudgetViewModel(private val repo: FinanceRepository) : ViewModel() {
     val items: StateFlow<List<BudgetItem>> = combine(rawItems, _sortOrder, _ascending) { list, order, asc ->
         val sorted = when (order) {
             SortOrder.ALPHA -> list.sortedBy { it.name.lowercase() }
-            SortOrder.SIZE -> list.sortedBy { it.goodAmount }
+            SortOrder.AVG -> list.sortedBy { (it.goodAmount + it.badAmount) / 2.0 }
+            SortOrder.LAST -> list.sortedBy { it.lastAmount }
         }
         if (asc) sorted else sorted.reversed()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())

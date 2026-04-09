@@ -85,14 +85,14 @@ fun BalancesScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
 
             // Sort selector
             SegmentedSelector(
-                options = SortOrder.entries.toList(),
+                options = listOf(SortOrder.ALPHA, SortOrder.AVG),
                 selected = sortOrder,
                 onSelect = { vm.setSortOrder(it) },
                 label = { order ->
                     val arrow = if (order == sortOrder) { if (ascending) " \u25B2" else " \u25BC" } else ""
                     when (order) {
                         SortOrder.ALPHA -> "a-z$arrow"
-                        SortOrder.SIZE -> "size$arrow"
+                        else -> "size$arrow"
                     }
                 }
             )
@@ -184,7 +184,7 @@ private fun TotalsPanel(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(6.dp)
+                .height(14.dp)
                 .clip(MaterialTheme.shapes.small)
         ) {
             Reliability.entries.forEach { r ->
@@ -204,18 +204,12 @@ private fun TotalsPanel(
 
 @Composable
 private fun SectionHeader(label: String, color: Color) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            label,
-            style = MaterialTheme.typography.labelSmall,
-            color = color,
-            modifier = Modifier.padding(end = 8.dp)
-        )
-        HorizontalDivider(color = color.copy(alpha = 0.3f), modifier = Modifier.weight(1f))
-    }
+    Text(
+        label,
+        style = MaterialTheme.typography.labelMedium,
+        color = color,
+        modifier = Modifier.padding(vertical = 4.dp)
+    )
 }
 
 @Composable

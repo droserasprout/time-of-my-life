@@ -76,7 +76,8 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                     val arrow = if (order == sortOrder) { if (ascending) " \u25B2" else " \u25BC" } else ""
                     when (order) {
                         SortOrder.ALPHA -> "a-z$arrow"
-                        SortOrder.SIZE -> "size$arrow"
+                        SortOrder.AVG -> "avg$arrow"
+                        SortOrder.LAST -> "last$arrow"
                     }
                 }
             )
@@ -168,18 +169,12 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
 
 @Composable
 private fun SectionHeader(label: String, color: Color) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            label,
-            style = MaterialTheme.typography.labelSmall,
-            color = color,
-            modifier = Modifier.padding(end = 8.dp)
-        )
-        HorizontalDivider(color = color.copy(alpha = 0.3f), modifier = Modifier.weight(1f))
-    }
+    Text(
+        label,
+        style = MaterialTheme.typography.labelMedium,
+        color = color,
+        modifier = Modifier.padding(vertical = 4.dp)
+    )
 }
 
 @Composable
@@ -215,7 +210,6 @@ private fun TotalsCard(
             TickBar(good = netGood, bad = netBad, last = netLast, modifier = Modifier.width(AMOUNT_COL_WIDTH * 3))
         }
         Spacer(modifier = Modifier.height(8.dp))
-        HorizontalDivider(color = LastGrey.copy(alpha = 0.3f))
     }
 }
 
