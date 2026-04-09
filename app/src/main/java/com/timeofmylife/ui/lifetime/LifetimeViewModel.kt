@@ -8,15 +8,21 @@ import com.timeofmylife.domain.LifetimeCalculator
 import com.timeofmylife.domain.LifetimeRow
 import kotlinx.coroutines.flow.*
 
+enum class BudgetMode { ALL, EXPENSE, INCOME }
+
 class LifetimeViewModel(repo: FinanceRepository) : ViewModel() {
 
-    private val _includeIncome = MutableStateFlow(true)
-    val includeIncome: StateFlow<Boolean> = _includeIncome
+    private val _budgetMode = MutableStateFlow(BudgetMode.ALL)
+    val budgetMode: StateFlow<BudgetMode> = _budgetMode
 
-    fun toggleIncome() { _includeIncome.value = !_includeIncome.value }
+    fun setBudgetMode(mode: BudgetMode) { _budgetMode.value = mode }
 
-    val rows: StateFlow<List<LifetimeRow>> = combine(repo.balances, repo.budgetItems, _includeIncome) { balances, items, income ->
-        LifetimeCalculator.calculate(balances, items, income)
+    val rows: StateFlow<List<LifetimeRow>> = combine(repo.balances, repo.budgetItems, _budgetMode) { balances, items, mode ->
+        LifetimeCalculator.calculate(
+            balances, items,
+            includeIncome = mode != BudgetMode.EXPENSE,
+            includeExpenses = mode != BudgetMode.INCOME
+        )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     class Factory(private val repo: FinanceRepository) : ViewModelProvider.Factory {

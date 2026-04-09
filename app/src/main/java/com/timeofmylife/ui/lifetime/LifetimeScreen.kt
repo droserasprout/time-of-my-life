@@ -6,15 +6,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -56,68 +58,97 @@ private val BUDGET_COLORS = mapOf(
 fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     val vm: LifetimeViewModel = viewModel(factory = LifetimeViewModel.Factory(repository))
     val rows by vm.rows.collectAsStateWithLifecycle()
-    val includeIncome by vm.includeIncome.collectAsStateWithLifecycle()
+    val budgetMode by vm.budgetMode.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(top = innerPadding.calculateTopPadding(), bottom = innerPadding.calculateBottomPadding())
-            .verticalScroll(rememberScrollState())
     ) {
-        // Income toggle
-        Row(
+        // Scrollable tables
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
         ) {
-            Text(
-                "Income",
-                style = MaterialTheme.typography.labelMedium,
-                color = if (includeIncome) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Switch(
-                checked = includeIncome,
-                onCheckedChange = { vm.toggleIncome() },
-                modifier = Modifier.padding(start = 8.dp)
-            )
-        }
+            // Budget mode selector
+            BudgetModeSelector(budgetMode) { vm.setBudgetMode(it) }
 
-        // Balance matrix table (horizontal scroll for narrow screens)
-        Column(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(16.dp)) {
-            Row {
-                BALANCE_COLUMNS.forEachIndexed { i, col ->
-                    HeaderCell(col, if (i == 0) 120.dp else 70.dp)
+            // Balance matrix table (horizontal scroll for narrow screens)
+            Column(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(16.dp)) {
+                Row {
+                    BALANCE_COLUMNS.forEachIndexed { i, col ->
+                        HeaderCell(col, if (i == 0) 120.dp else 70.dp)
+                    }
+                }
+                HorizontalDivider()
+                rows.forEachIndexed { index, row ->
+                    BalanceRow(row, LifetimeRowColors.getOrElse(index) { Color.Transparent })
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                 }
             }
-            HorizontalDivider()
-            rows.forEachIndexed { index, row ->
-                BalanceRow(row, LifetimeRowColors.getOrElse(index) { Color.Transparent })
-                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Survival table — full width
+            Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    SurvivalHeaderCell(SURVIVAL_COLUMNS[0], isLabel = true)
+                    SurvivalHeaderCell(SURVIVAL_COLUMNS[1])
+                    SurvivalHeaderCell(SURVIVAL_COLUMNS[2])
+                }
+                rows.forEachIndexed { index, row ->
+                    SurvivalRow(row, LifetimeRowColors.getOrElse(index) { Color.Transparent })
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Survival table — full width, no horizontal scroll
-        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-            Row(modifier = Modifier.fillMaxWidth()) {
-                SurvivalHeaderCell(SURVIVAL_COLUMNS[0], isLabel = true)
-                SurvivalHeaderCell(SURVIVAL_COLUMNS[1])
-                SurvivalHeaderCell(SURVIVAL_COLUMNS[2])
-            }
-            HorizontalDivider()
-            rows.forEachIndexed { index, row ->
-                SurvivalRow(row, LifetimeRowColors.getOrElse(index) { Color.Transparent })
-                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Coverage bar
+        // Coverage bar pinned to bottom
         LifetimeCoverageBar(rows)
+    }
+}
+
+@Composable
+private fun BudgetModeSelector(selected: BudgetMode, onSelect: (BudgetMode) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        BudgetMode.entries.forEachIndexed { index, mode ->
+            if (index > 0) {
+                Text(
+                    "|",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+            }
+            val isSelected = mode == selected
+            Text(
+                text = mode.name.lowercase(),
+                style = MaterialTheme.typography.labelMedium,
+                color = if (isSelected) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .clickable { onSelect(mode) }
+                    .then(
+                        if (isSelected) Modifier.drawBehind {
+                            val strokeWidth = 2.dp.toPx()
+                            drawLine(
+                                color = Purple,
+                                start = Offset(0f, size.height),
+                                end = Offset(size.width, size.height),
+                                strokeWidth = strokeWidth
+                            )
+                        } else Modifier
+                    )
+                    .padding(vertical = 4.dp, horizontal = 2.dp)
+            )
+        }
     }
 }
 
@@ -311,13 +342,13 @@ private fun LifetimeCoverageBar(rows: List<LifetimeRow>) {
     val surfaceColor = MaterialTheme.colorScheme.background
 
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        // Year labels above bars
+        YearLabels(currentYear, maxYears)
+        Spacer(modifier = Modifier.height(2.dp))
+
         SegmentedBar("worst", worst, maxYears, surfaceColor)
         Spacer(modifier = Modifier.height(4.dp))
         SegmentedBar("best", best, maxYears, surfaceColor)
-
-        // Year labels
-        Spacer(modifier = Modifier.height(2.dp))
-        YearLabels(currentYear, maxYears)
 
         Spacer(modifier = Modifier.height(6.dp))
 
@@ -351,7 +382,7 @@ private fun YearLabels(currentYear: Int, maxYears: Double) {
             Text(
                 text = yearLabel,
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
             )
         }
     }
@@ -403,21 +434,21 @@ private fun SegmentedBar(label: String, segments: BarSegments, maxYears: Double,
                     )
                 }
             }
-            // Edge gradients
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .width(gradientWidth)
-                    .fillMaxHeight()
-                    .background(Brush.horizontalGradient(listOf(surfaceColor, Color.Transparent)))
-            )
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .width(gradientWidth)
-                    .fillMaxHeight()
-                    .background(Brush.horizontalGradient(listOf(Color.Transparent, surfaceColor)))
-            )
+            // Edge gradients (look weird)
+            // Box(
+            //     modifier = Modifier
+            //         .align(Alignment.CenterStart)
+            //         .width(gradientWidth)
+            //         .fillMaxHeight()
+            //         .background(Brush.horizontalGradient(listOf(surfaceColor, Color.Transparent)))
+            // )
+            // Box(
+            //     modifier = Modifier
+            //         .align(Alignment.CenterEnd)
+            //         .width(gradientWidth)
+            //         .fillMaxHeight()
+            //         .background(Brush.horizontalGradient(listOf(Color.Transparent, surfaceColor)))
+            // )
         }
     }
 }
