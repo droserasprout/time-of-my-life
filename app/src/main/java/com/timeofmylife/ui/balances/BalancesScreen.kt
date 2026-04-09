@@ -124,7 +124,7 @@ private fun BalanceItem(
                         size = androidx.compose.ui.geometry.Size(4.dp.toPx(), size.height)
                     )
                 }
-                .padding(start = 16.dp, end = 12.dp, top = 12.dp, bottom = 12.dp),
+                .padding(start = 16.dp, end = 12.dp, top = 10.dp, bottom = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
