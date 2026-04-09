@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -69,8 +68,7 @@ fun BalancesScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                 items(items, key = { it.id }) { balance ->
                     BalanceItem(
                         balance = balance,
-                        onTap = { quickEditTarget = balance },
-                        onDelete = { vm.delete(balance) }
+                        onTap = { quickEditTarget = balance }
                     )
                 }
             }
@@ -89,7 +87,12 @@ fun BalancesScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
         AddEditBalanceDialog(null, onConfirm = { vm.upsert(it); showAddDialog = false }, onDismiss = { showAddDialog = false })
     }
     editTarget?.let { target ->
-        AddEditBalanceDialog(target, onConfirm = { vm.upsert(it); editTarget = null }, onDismiss = { editTarget = null })
+        AddEditBalanceDialog(
+            initial = target,
+            onConfirm = { vm.upsert(it); editTarget = null },
+            onDelete = { vm.delete(target); editTarget = null },
+            onDismiss = { editTarget = null }
+        )
     }
     quickEditTarget?.let { target ->
         QuickEditBalanceDialog(
@@ -101,60 +104,36 @@ fun BalancesScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BalanceItem(
     balance: Balance,
-    onTap: () -> Unit,
-    onDelete: () -> Unit
+    onTap: () -> Unit
 ) {
-    val dismissState = rememberSwipeToDismissBoxState(
-        confirmValueChange = { value ->
-            if (value == SwipeToDismissBoxValue.EndToStart) { onDelete(); true } else false
-        }
-    )
-    SwipeToDismissBox(
-        state = dismissState,
-        backgroundContent = {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                Icon(
-                    Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(end = 16.dp)
-                )
-            }
-        }
+    val borderColor = reliabilityColor(balance.reliability)
+    Surface(
+        shape = MaterialTheme.shapes.medium,
+        tonalElevation = 1.dp,
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onTap)
     ) {
-        val borderColor = reliabilityColor(balance.reliability)
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            tonalElevation = 1.dp,
-            modifier = Modifier.fillMaxWidth().clickable(onClick = onTap)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .drawBehind {
+                    drawRect(
+                        color = borderColor,
+                        size = androidx.compose.ui.geometry.Size(4.dp.toPx(), size.height)
+                    )
+                }
+                .padding(start = 16.dp, end = 12.dp, top = 12.dp, bottom = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .drawBehind {
-                        drawRect(
-                            color = borderColor,
-                            size = androidx.compose.ui.geometry.Size(4.dp.toPx(), size.height)
-                        )
-                    }
-                    .padding(start = 16.dp, end = 12.dp, top = 12.dp, bottom = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(balance.name, style = MaterialTheme.typography.bodyLarge)
-                Text(
-                    formatAmount(balance.amount, LocalDemoMode.current),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = borderColor
-                )
-            }
+            Text(balance.name, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                formatAmount(balance.amount, LocalDemoMode.current),
+                style = MaterialTheme.typography.bodyLarge,
+                color = borderColor
+            )
         }
     }
 }

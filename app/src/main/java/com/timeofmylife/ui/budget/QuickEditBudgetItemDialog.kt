@@ -1,4 +1,4 @@
-package com.timeofmylife.ui.balances
+package com.timeofmylife.ui.budget
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -13,16 +13,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.timeofmylife.data.model.Balance
+import com.timeofmylife.data.model.BudgetItem
 
 @Composable
-fun QuickEditBalanceDialog(
-    balance: Balance,
-    onSave: (Balance) -> Unit,
+fun QuickEditBudgetItemDialog(
+    item: BudgetItem,
+    onSave: (BudgetItem) -> Unit,
     onFullEdit: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    val initialText = balance.amount.toString()
+    val initialText = if (item.lastAmount == 0.0) "" else item.lastAmount.toString()
     var field by remember {
         mutableStateOf(TextFieldValue(initialText, TextRange(0, initialText.length)))
     }
@@ -32,7 +32,7 @@ fun QuickEditBalanceDialog(
 
     fun save() {
         val amount = field.text.toDoubleOrNull() ?: return
-        onSave(balance.copy(amount = amount))
+        onSave(item.copy(lastAmount = amount))
     }
 
     Dialog(onDismissRequest = onDismiss) {
@@ -41,7 +41,7 @@ fun QuickEditBalanceDialog(
                 OutlinedTextField(
                     value = field,
                     onValueChange = { field = it },
-                    label = { Text(balance.name) },
+                    label = { Text(item.name) },
                     modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     keyboardActions = KeyboardActions(onDone = { save() }),

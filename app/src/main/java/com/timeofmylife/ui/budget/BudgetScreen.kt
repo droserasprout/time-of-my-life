@@ -39,6 +39,7 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     val ascending by vm.ascending.collectAsStateWithLifecycle()
     var showAddDialog by remember { mutableStateOf(false) }
     var editTarget by remember { mutableStateOf<BudgetItem?>(null) }
+    var quickEditTarget by remember { mutableStateOf<BudgetItem?>(null) }
 
     val expenses = remember(items) { items.filter { it.type == ItemType.EXPENSE } }
     val incomes = remember(items) { items.filter { it.type == ItemType.INCOME } }
@@ -89,13 +90,13 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                 if (expenses.isNotEmpty()) {
                     item { SectionHeader("Expenses", ExpenseRed) }
                     items(expenses, key = { it.id }) { item ->
-                        BudgetItemRow(item = item, onEdit = { editTarget = item })
+                        BudgetItemRow(item = item, onEdit = { quickEditTarget = item })
                     }
                 }
                 if (incomes.isNotEmpty()) {
                     item { SectionHeader("Income", IncomeGreen) }
                     items(incomes, key = { it.id }) { item ->
-                        BudgetItemRow(item = item, onEdit = { editTarget = item })
+                        BudgetItemRow(item = item, onEdit = { quickEditTarget = item })
                     }
                 }
             }
@@ -124,6 +125,14 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
             onConfirm = { vm.upsert(it); editTarget = null },
             onDelete = { vm.delete(target); editTarget = null },
             onDismiss = { editTarget = null }
+        )
+    }
+    quickEditTarget?.let { target ->
+        QuickEditBudgetItemDialog(
+            item = target,
+            onSave = { vm.upsert(it); quickEditTarget = null },
+            onFullEdit = { quickEditTarget = null; editTarget = target },
+            onDismiss = { quickEditTarget = null }
         )
     }
 }
