@@ -23,7 +23,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 private fun timestamp(): String =
-    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
 
 @Composable
 fun ImportExportScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
@@ -115,13 +115,13 @@ fun ImportExportScreen(repository: FinanceRepository, innerPadding: PaddingValue
     ) {
             Text("Export", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
             ImportExportItem("Export JSON", "Single file with all data") {
-                jsonExportLauncher.launch("finances_${timestamp()}.json")
+                jsonExportLauncher.launch("timeofmylife-${timestamp()}.json")
             }
             ImportExportItem("Export balances CSV", "Single CSV file") {
-                balancesCsvExportLauncher.launch("balances_${timestamp()}.csv")
+                balancesCsvExportLauncher.launch("timeofmylife-balances-${timestamp()}.csv")
             }
             ImportExportItem("Export budget CSV", "Single CSV file") {
-                budgetCsvExportLauncher.launch("budget_${timestamp()}.csv")
+                budgetCsvExportLauncher.launch("timeofmylife-budget-${timestamp()}.csv")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
