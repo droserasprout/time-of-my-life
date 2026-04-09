@@ -46,14 +46,14 @@ fun AddEditBudgetItemDialog(
                         FilterChip(
                             selected = type == t,
                             onClick = { type = t },
-                            label = { Text(t.name.lowercase().replaceFirstChar { it.uppercase() }) }
+                            label = { Text(t.name.lowercase()) }
                         )
                     }
                 }
                 OutlinedTextField(
                     value = bestText,
                     onValueChange = { bestText = it },
-                    label = { Text("Best amount (USD)") },
+                    label = { Text("Best amount") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true
@@ -61,7 +61,7 @@ fun AddEditBudgetItemDialog(
                 OutlinedTextField(
                     value = worstText,
                     onValueChange = { worstText = it },
-                    label = { Text("Worst amount (USD)") },
+                    label = { Text("Worst amount") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true
@@ -69,7 +69,7 @@ fun AddEditBudgetItemDialog(
                 OutlinedTextField(
                     value = lastText,
                     onValueChange = { lastText = it },
-                    label = { Text("Last month (USD)") },
+                    label = { Text("Last month") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true

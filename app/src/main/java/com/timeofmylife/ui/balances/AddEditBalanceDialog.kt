@@ -41,7 +41,7 @@ fun AddEditBalanceDialog(
                 OutlinedTextField(
                     value = amountText,
                     onValueChange = { amountText = it },
-                    label = { Text("Amount (USD)") },
+                    label = { Text("Amount") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true
@@ -52,7 +52,7 @@ fun AddEditBalanceDialog(
                         FilterChip(
                             selected = reliability == r,
                             onClick = { reliability = r },
-                            label = { Text(r.name) }
+                            label = { Text(r.name.lowercase()) }
                         )
                     }
                 }
