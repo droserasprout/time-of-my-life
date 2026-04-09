@@ -1,19 +1,8 @@
 package com.timeofmylife.ui.balances
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
+import androidx.compose.runtime.Composable
 import com.timeofmylife.data.model.Balance
+import com.timeofmylife.ui.QuickEditDialog
 
 @Composable
 fun QuickEditBalanceDialog(
@@ -22,43 +11,11 @@ fun QuickEditBalanceDialog(
     onFullEdit: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    val initialText = balance.amount.toString()
-    var field by remember {
-        mutableStateOf(TextFieldValue(initialText, TextRange(0, initialText.length)))
-    }
-    val focusRequester = remember { FocusRequester() }
-
-    LaunchedEffect(Unit) { focusRequester.requestFocus() }
-
-    fun save() {
-        val amount = field.text.toDoubleOrNull() ?: return
-        onSave(balance.copy(amount = amount))
-    }
-
-    Dialog(onDismissRequest = onDismiss) {
-        Card(shape = MaterialTheme.shapes.large) {
-            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-                OutlinedTextField(
-                    value = field,
-                    onValueChange = { field = it },
-                    label = { Text(balance.name) },
-                    modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    keyboardActions = KeyboardActions(onDone = { save() }),
-                    singleLine = true
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    TextButton(onClick = onFullEdit) { Text("Edit") }
-                    Row {
-                        TextButton(onClick = onDismiss) { Text("Cancel") }
-                        TextButton(onClick = { save() }) { Text("Save") }
-                    }
-                }
-            }
-        }
-    }
+    QuickEditDialog(
+        title = balance.name,
+        initialValue = balance.amount.toString(),
+        onSave = { amount -> onSave(balance.copy(amount = amount)) },
+        onFullEdit = onFullEdit,
+        onDismiss = onDismiss
+    )
 }
