@@ -29,7 +29,7 @@ private fun timestamp(): String =
     LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
 
 @Composable
-fun SettingsScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
+fun SettingsScreen(repository: FinanceRepository, innerPadding: PaddingValues, onShowWelcome: () -> Unit, onShowHelp: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var showImportConfirm by remember { mutableStateOf<(() -> Unit)?>(null) }
@@ -159,6 +159,14 @@ fun SettingsScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
         SettingsItem("Import budget CSV", "Replace budget items from a CSV file") {
             budgetCsvImportLauncher.launch(arrayOf("text/csv", "*/*"))
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text("Help", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+        SettingsItem("Show welcome screen", "View the intro again") {
+            onShowWelcome()
+        }
+        SettingsItem("Show help", "How the app works") { onShowHelp() }
     }
 
     showImportConfirm?.let { onConfirm ->

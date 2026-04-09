@@ -1,6 +1,7 @@
 package com.timeofmylife.ui.welcome
 
 import android.content.Context
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -33,8 +34,11 @@ fun markWelcomeSeen(context: Context) {
 }
 
 @Composable
-fun WelcomeScreen(onGetStarted: () -> Unit) {
+fun WelcomeScreen(onGetStarted: () -> Unit, onShowHelp: () -> Unit) {
     val context = LocalContext.current
+    if (hasSeenWelcome(context)) {
+        BackHandler(onBack = onGetStarted)
+    }
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -84,6 +88,13 @@ fun WelcomeScreen(onGetStarted: () -> Unit) {
 
             Spacer(Modifier.height(40.dp))
 
+            OutlinedButton(
+                onClick = onShowHelp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Show Help")
+            }
+            Spacer(Modifier.height(12.dp))
             Button(
                 onClick = {
                     markWelcomeSeen(context)

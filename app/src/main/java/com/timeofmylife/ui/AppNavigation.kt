@@ -33,7 +33,7 @@ private val screens = listOf(Screen.Balances, Screen.Budget, Screen.Lifetime, Sc
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AppNavigation(repository: FinanceRepository) {
+fun AppNavigation(repository: FinanceRepository, onShowWelcome: () -> Unit, onShowHelp: () -> Unit) {
     val pagerState = rememberPagerState(pageCount = { screens.size })
     val scope = rememberCoroutineScope()
 
@@ -62,7 +62,7 @@ fun AppNavigation(repository: FinanceRepository) {
                 0 -> BalancesScreen(repository, pagePadding)
                 1 -> BudgetScreen(repository, pagePadding)
                 2 -> LifetimeScreen(repository, pagePadding)
-                3 -> SettingsScreen(repository, pagePadding)
+                3 -> SettingsScreen(repository, pagePadding, onShowWelcome, onShowHelp)
             }
         }
     }

@@ -10,6 +10,7 @@ import com.timeofmylife.ui.LocalDemoMode
 import com.timeofmylife.ui.LocalSetDemoMode
 import com.timeofmylife.ui.isDemoMode
 import com.timeofmylife.ui.persistDemoMode
+import com.timeofmylife.ui.help.HelpScreen
 import com.timeofmylife.ui.theme.TimeOfMyLifeTheme
 import com.timeofmylife.ui.welcome.WelcomeScreen
 import com.timeofmylife.ui.welcome.hasSeenWelcome
@@ -31,10 +32,20 @@ class MainActivity : ComponentActivity() {
                     }
                 ) {
                     var showWelcome by remember { mutableStateOf(!hasSeenWelcome(ctx)) }
-                    if (showWelcome) {
-                        WelcomeScreen(onGetStarted = { showWelcome = false })
+                    var showHelp by remember { mutableStateOf(false) }
+                    if (showHelp) {
+                        HelpScreen(onBack = { showHelp = false })
+                    } else if (showWelcome) {
+                        WelcomeScreen(
+                            onGetStarted = { showWelcome = false },
+                            onShowHelp = { showHelp = true }
+                        )
                     } else {
-                        AppNavigation(repository)
+                        AppNavigation(
+                            repository,
+                            onShowWelcome = { showWelcome = true },
+                            onShowHelp = { showHelp = true }
+                        )
                     }
                 }
             }
