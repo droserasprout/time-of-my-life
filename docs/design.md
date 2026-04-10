@@ -146,17 +146,6 @@ Box(fillMaxSize)
 
 ```text
 Column(fillMaxSize, padding: top/bottom=innerPadding)
-  Column(weight=1, verticalScroll)
-    SegmentedSelector (all | expense | income)
-    Balance table (fillMaxWidth, padding: h=16)
-      HeaderCell: weight=1f each, labelMedium, alpha=0.6
-      BalanceRow: weight=1f each, bodySmall, NegativeText if negative
-      Dividers: outline, alpha=0.2
-    Spacer(16)
-    Survival table (fillMaxWidth, padding: h=16)
-      SurvivalHeaderCell: weight=1f each, labelMedium, alpha=0.6
-      SurvivalRow: bodySmall, scenario dots 8dp CircleShape
-      Dividers: outline, alpha=0.2
   LifetimeCoverageBar (padding: h=16, v=8)
     YearLabels or "infinity": labelSmall, alpha=0.4, start=40dp offset
     Spacer(2)
@@ -164,6 +153,17 @@ Column(fillMaxSize, padding: top/bottom=innerPadding)
     Spacer(4)
     SegmentedBar (best)
     Spacer(6)
+  SegmentedSelector (all | expense | income)
+  Column(weight=1, verticalScroll)
+    Balance table (horizontalScroll, padding: 16)
+      HeaderCell: Scenario 120dp + amounts 70dp each, labelMedium, alpha=0.6
+      BalanceRow: bodySmall, NegativeText if negative, scenario dots 8dp
+      Dividers: outline, alpha=0.2
+    Spacer(16)
+    Survival table (fillMaxWidth, padding: h=16)
+      SurvivalHeaderCell: weight=1f each, labelMedium, alpha=0.6
+      SurvivalRow: bodySmall, scenario dots 8dp CircleShape
+      Dividers: outline, alpha=0.2
 ```
 
 ### Settings

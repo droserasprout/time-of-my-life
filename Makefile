@@ -7,16 +7,16 @@ export ANDROID_HOME
 .PHONY: $(MAKECMDGOALS)
 
 build:
-	./gradlew --no-daemon assembleDebug
+	./gradlew assembleDebug
 
 install:
-	./gradlew --no-daemon installDebug
+	./gradlew installDebug
 
 test:
-	./gradlew --no-daemon test
+	./gradlew test
 
 lint-docs:
-	markdownlint docs/ --ignore docs/superpowers/
+	markdownlint docs/
 
 clean:
-	./gradlew --no-daemon clean
+	./gradlew clean
