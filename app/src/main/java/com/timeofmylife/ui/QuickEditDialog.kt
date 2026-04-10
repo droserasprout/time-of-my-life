@@ -39,10 +39,11 @@ fun QuickEditDialog(
     Dialog(onDismissRequest = onDismiss) {
         Card(shape = RoundedCornerShape(DialogCornerRadius)) {
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                Text(title, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(modifier = Modifier.height(4.dp))
                 OutlinedTextField(
                     value = field,
                     onValueChange = { field = it },
-                    label = { Text(title) },
                     modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     keyboardActions = KeyboardActions(onDone = { save() }),
