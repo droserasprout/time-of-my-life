@@ -49,20 +49,19 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     val incomeLast = remember(incomes) { incomes.sumOf { it.lastAmount } }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // Totals pinned at top
+        Column(modifier = Modifier.fillMaxSize().padding(top = innerPadding.calculateTopPadding())) {
+            // Totals panel
             if (items.isNotEmpty()) {
                 TotalsCard(
                     expenseBest, expenseWorst, expenseLast,
                     incomeBest, incomeWorst, incomeLast,
                     modifier = Modifier.padding(
-                        top = innerPadding.calculateTopPadding() + 4.dp,
                         start = ScreenHorizontalPadding, end = ScreenHorizontalPadding
                     )
                 )
             }
 
-            // Sort selector below separator
+            // Sort selector
             SegmentedSelector(
                 options = SortOrder.entries.toList(),
                 selected = sortOrder,
@@ -84,7 +83,7 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                     start = ScreenHorizontalPadding, end = ScreenHorizontalPadding
                 ),
                 verticalArrangement = Arrangement.spacedBy(ItemSpacing),
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.weight(1f)
             ) {
                 if (expenses.isNotEmpty()) {
                     item { SectionHeader("Expenses", ExpenseRed) }

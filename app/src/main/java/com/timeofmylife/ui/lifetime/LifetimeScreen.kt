@@ -59,22 +59,23 @@ fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
             .fillMaxSize()
             .padding(top = innerPadding.calculateTopPadding(), bottom = innerPadding.calculateBottomPadding())
     ) {
+        // Coverage bar pinned to top
+        LifetimeCoverageBar(rows)
+
+        // Budget mode selector
+        SegmentedSelector(
+            options = BudgetMode.entries.toList(),
+            selected = budgetMode,
+            onSelect = { vm.setBudgetMode(it) },
+            label = { it.name.lowercase() }
+        )
+
         // Scrollable tables
         Column(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Budget mode selector
-            SegmentedSelector(
-                options = BudgetMode.entries.toList(),
-                selected = budgetMode,
-                onSelect = { vm.setBudgetMode(it) },
-                label = { it.name.lowercase() }
-            )
-
-            // Balance matrix table
-            // Balance matrix table (horizontal scroll for narrow screens)
             Column(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(16.dp)) {
                 Row {
                     BALANCE_COLUMNS.forEachIndexed { i, col ->
@@ -103,9 +104,6 @@ fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                 }
             }
         }
-
-        // Coverage bar pinned to bottom
-        LifetimeCoverageBar(rows)
     }
 }
 

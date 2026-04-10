@@ -70,11 +70,10 @@ fun BalancesScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize().padding(top = innerPadding.calculateTopPadding())) {
             // Totals panel
             if (items.isNotEmpty()) {
                 TotalsPanel(tierSums, totalAmount, modifier = Modifier.padding(
-                    top = innerPadding.calculateTopPadding() + 4.dp,
                     start = ScreenHorizontalPadding, end = ScreenHorizontalPadding
                 ))
             }
@@ -100,7 +99,7 @@ fun BalancesScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                     start = ScreenHorizontalPadding, end = ScreenHorizontalPadding
                 ),
                 verticalArrangement = Arrangement.spacedBy(ItemSpacing),
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.weight(1f)
             ) {
                 groupedItems.forEach { entry ->
                     when (entry) {
