@@ -97,13 +97,11 @@ fun BalancesScreen(
                 selected = sortOrder,
                 onSelect = { vm.setSortOrder(it) },
                 label = { order ->
-                    val arrow = if (ascending) " \u25B2" else " \u25BC"
                     when (order) {
-                        SortOrder.ALPHA -> "a-z$arrow"
-                        else -> "amount$arrow"
+                        SortOrder.ALPHA -> "a-z"
+                        else -> "amount"
                     }
                 },
-                showSuffix = { it == sortOrder },
             )
 
             LazyColumn(
