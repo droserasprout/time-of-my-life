@@ -34,7 +34,7 @@ fun ItemCard(
                             size = androidx.compose.ui.geometry.Size(CardBorderWidth.toPx(), size.height),
                         )
                     }
-                    .padding(start = 16.dp, end = 12.dp, top = 10.dp, bottom = 10.dp),
+                    .padding(start = 16.dp, end = 12.dp, top = 7.dp, bottom = 7.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
             content = content,
