@@ -37,7 +37,7 @@ fun AddEditBudgetItemDialog(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Name") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 48.dp),
                     singleLine = true,
                 )
                 Text("Type", style = MaterialTheme.typography.labelMedium)
@@ -54,7 +54,7 @@ fun AddEditBudgetItemDialog(
                     value = bestText,
                     onValueChange = { bestText = it },
                     label = { Text("Best amount") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 48.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
                 )
@@ -62,7 +62,7 @@ fun AddEditBudgetItemDialog(
                     value = worstText,
                     onValueChange = { worstText = it },
                     label = { Text("Worst amount") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 48.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
                 )
@@ -70,12 +70,12 @@ fun AddEditBudgetItemDialog(
                     value = lastText,
                     onValueChange = { lastText = it },
                     label = { Text("Last month") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 48.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
                 )
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 48.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     // Delete on the left, only in edit mode

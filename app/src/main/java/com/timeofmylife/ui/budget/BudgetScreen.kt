@@ -172,7 +172,7 @@ fun BudgetScreen(
                 BudgetColumn.WORST -> target.worstAmount
             }
         QuickEditDialog(
-            title = "${target.name} | $columnLabel",
+            title = "${target.name} \u2014 $columnLabel",
             initialValue = if (initialValue == 0.0) "" else initialValue.toString(),
             onSave = { amount ->
                 val updated =

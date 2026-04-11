@@ -44,7 +44,7 @@ fun QuickEditDialog(
                 OutlinedTextField(
                     value = field,
                     onValueChange = { field = it },
-                    modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
+                    modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 48.dp).focusRequester(focusRequester),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     keyboardActions = KeyboardActions(onDone = { save() }),
                     singleLine = true,
