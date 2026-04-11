@@ -190,6 +190,28 @@ private fun TotalsPanel(
 ) {
     val demo = LocalDemoMode.current
     Column(modifier = modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp)) {
+        // Proportion bar
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(BarHeight)
+                    .clip(MaterialTheme.shapes.small),
+        ) {
+            Reliability.entries.forEach { r ->
+                val sum = tierSums[r] ?: 0.0
+                if (sum > 0 && totalAmount > 0) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .weight((sum / totalAmount).toFloat())
+                                .fillMaxHeight()
+                                .background(reliabilityColor(r)),
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(ItemSpacing))
         // Header row
         Row(modifier = Modifier.fillMaxWidth()) {
             Spacer(modifier = Modifier.weight(1f))
@@ -236,28 +258,6 @@ private fun TotalsPanel(
                     textAlign = TextAlign.End,
                     modifier = Modifier.width(PCT_COL_WIDTH),
                 )
-            }
-        }
-        Spacer(modifier = Modifier.height(ItemSpacing))
-        // Proportion bar
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(BarHeight)
-                    .clip(MaterialTheme.shapes.small),
-        ) {
-            Reliability.entries.forEach { r ->
-                val sum = tierSums[r] ?: 0.0
-                if (sum > 0 && totalAmount > 0) {
-                    Box(
-                        modifier =
-                            Modifier
-                                .weight((sum / totalAmount).toFloat())
-                                .fillMaxHeight()
-                                .background(reliabilityColor(r)),
-                    )
-                }
             }
         }
     }

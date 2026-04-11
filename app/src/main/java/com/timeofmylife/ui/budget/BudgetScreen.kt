@@ -10,8 +10,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -217,6 +219,14 @@ private fun TotalsCard(
     val netWorst = incomeWorst - expenseWorst
     val netLast = incomeLast - expenseLast
     Column(modifier = modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp)) {
+        // Accuracy bar at top
+        TickBar(
+            best = netBest,
+            worst = netWorst,
+            last = netLast,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(modifier = Modifier.height(ItemSpacing))
         // Header row
         Row(modifier = Modifier.fillMaxWidth()) {
             Spacer(modifier = Modifier.weight(1f))
@@ -246,15 +256,6 @@ private fun TotalsCard(
         TotalsRow("Expenses", expenseBest, expenseWorst, expenseLast, ExpenseRed)
         TotalsRow("Income", incomeBest, incomeWorst, incomeLast, IncomeGreen)
         TotalsRow("Net", netBest, netWorst, netLast, MaterialTheme.colorScheme.onSurface)
-        // Accuracy bar matching row layout
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Spacer(modifier = Modifier.weight(1f))
-            TickBar(best = netBest, worst = netWorst, last = netLast, modifier = Modifier.width(AmountColumnWidth * 3))
-        }
-        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
@@ -305,28 +306,43 @@ private fun TickBar(
 ) {
     val range = worst - best
     val fraction = if (range != 0.0) ((last - best) / range).toFloat().coerceIn(0f, 1f) else 0.5f
-    val barColor = LastGrey.copy(alpha = 0.3f)
     val tickColor = LastGrey
-    Box(
-        modifier =
-            modifier
-                .height(BarHeight)
-                .drawBehind {
-                    drawLine(
-                        color = barColor,
-                        start = Offset(0f, size.height / 2),
-                        end = Offset(size.width, size.height / 2),
-                        strokeWidth = 2.dp.toPx(),
-                    )
-                    val tickX = fraction * size.width
-                    drawLine(
-                        color = tickColor,
-                        start = Offset(tickX, 0f),
-                        end = Offset(tickX, size.height),
-                        strokeWidth = 2.dp.toPx(),
-                    )
-                },
-    )
+    val tickOverhang = 2.dp
+    val tickWidth = 8.dp
+    val tickRadius = 2.dp
+    val shape = MaterialTheme.shapes.small
+    Box(modifier = modifier.height(BarHeight + tickOverhang * 2)) {
+        // Background bar
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(BarHeight)
+                    .align(Alignment.Center)
+                    .clip(shape)
+                    .drawBehind {
+                        drawRect(color = BestBlue, topLeft = Offset.Zero, size = Size(size.width / 2, size.height))
+                        drawRect(color = WorstOrange, topLeft = Offset(size.width / 2, 0f), size = Size(size.width / 2, size.height))
+                    },
+        )
+        // Tick (rounded square, taller than bar)
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .drawBehind {
+                        val tickWidthPx = tickWidth.toPx()
+                        val tickX = (fraction * size.width - tickWidthPx / 2).coerceIn(0f, size.width - tickWidthPx)
+                        val tickRadiusPx = tickRadius.toPx()
+                        drawRoundRect(
+                            color = tickColor,
+                            topLeft = Offset(tickX, 0f),
+                            size = Size(tickWidthPx, size.height),
+                            cornerRadius = androidx.compose.ui.geometry.CornerRadius(tickRadiusPx),
+                        )
+                    },
+        )
+    }
 }
 
 @Composable
