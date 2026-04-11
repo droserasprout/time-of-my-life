@@ -1,13 +1,12 @@
 package com.timeofmylife.ui.lifetime
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,7 +18,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -83,31 +81,43 @@ fun LifetimeScreen(
                     .weight(1f)
                     .verticalScroll(rememberScrollState()),
         ) {
-            Column(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(16.dp)) {
-                Row {
-                    BALANCE_COLUMNS.forEachIndexed { i, col ->
-                        HeaderCell(col, if (i == 0) 120.dp else 70.dp)
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                tonalElevation = 1.dp,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            ) {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        BALANCE_COLUMNS.forEachIndexed { i, col ->
+                            HeaderCell(col, weight = if (i == 0) 1.5f else 1f, isLabel = i == 0)
+                        }
                     }
-                }
-                HorizontalDivider()
-                rows.forEachIndexed { index, row ->
-                    BalanceRow(row, LifetimeRowColors.getOrElse(index) { Color.Transparent })
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                    HorizontalDivider()
+                    rows.forEachIndexed { index, row ->
+                        BalanceRow(row, LifetimeRowColors.getOrElse(index) { Color.Transparent })
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Survival table — full width
-            Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    SurvivalHeaderCell(SURVIVAL_COLUMNS[0], isLabel = true)
-                    SurvivalHeaderCell(SURVIVAL_COLUMNS[1])
-                    SurvivalHeaderCell(SURVIVAL_COLUMNS[2])
-                }
-                rows.forEachIndexed { index, row ->
-                    SurvivalRow(row, LifetimeRowColors.getOrElse(index) { Color.Transparent })
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+            // Survival table
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                tonalElevation = 1.dp,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            ) {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        SurvivalHeaderCell(SURVIVAL_COLUMNS[0], isLabel = true)
+                        SurvivalHeaderCell(SURVIVAL_COLUMNS[1])
+                        SurvivalHeaderCell(SURVIVAL_COLUMNS[2])
+                    }
+                    rows.forEachIndexed { index, row ->
+                        SurvivalRow(row, LifetimeRowColors.getOrElse(index) { Color.Transparent })
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                    }
                 }
             }
         }
@@ -132,18 +142,19 @@ private fun RowScope.SurvivalHeaderCell(
 }
 
 @Composable
-private fun HeaderCell(
+private fun RowScope.HeaderCell(
     text: String,
-    width: Dp,
+    weight: Float = 1f,
+    isLabel: Boolean = false,
 ) {
     Text(
         text = text,
         style = MaterialTheme.typography.labelMedium,
         color = SubduedText,
-        textAlign = if (text == "Scenario") TextAlign.Start else TextAlign.End,
+        textAlign = if (isLabel) TextAlign.Start else TextAlign.End,
         modifier =
             Modifier
-                .width(width)
+                .weight(weight)
                 .padding(vertical = 6.dp, horizontal = 4.dp),
     )
 }
@@ -164,8 +175,8 @@ private fun ScenarioLabel(
         Box(
             modifier =
                 Modifier
-                    .size(8.dp)
-                    .clip(CircleShape)
+                    .size(10.dp)
+                    .clip(MaterialTheme.shapes.small)
                     .background(dotColor.copy(alpha = (dotColor.alpha * 2.5f).coerceAtMost(1f))),
         )
         Spacer(modifier = Modifier.width(6.dp))
@@ -187,16 +198,16 @@ private fun BalanceRow(
 ) {
     val demo = LocalDemoMode.current
     Row(
-        modifier = Modifier.padding(vertical = 2.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(modifier = Modifier.width(120.dp).padding(vertical = 8.dp, horizontal = 4.dp)) {
+        Box(modifier = Modifier.weight(1.5f).padding(vertical = 8.dp, horizontal = 4.dp)) {
             ScenarioLabel(row.label, dotColor)
         }
-        Cell(formatAmount(row.balance1m, demo), 70.dp)
-        Cell(formatAmount(row.balance3m, demo), 70.dp)
-        Cell(formatAmount(row.balance6m, demo), 70.dp)
-        Cell(formatAmount(row.balance12m, demo), 70.dp)
+        BalanceCell(formatAmount(row.balance1m, demo))
+        BalanceCell(formatAmount(row.balance3m, demo))
+        BalanceCell(formatAmount(row.balance6m, demo))
+        BalanceCell(formatAmount(row.balance12m, demo))
     }
 }
 
@@ -251,10 +262,7 @@ private fun RowScope.SurvivalCell(text: String) {
 }
 
 @Composable
-private fun Cell(
-    text: String,
-    width: Dp,
-) {
+private fun RowScope.BalanceCell(text: String) {
     val isNegative = text.startsWith("-")
     Text(
         text = text,
@@ -263,7 +271,7 @@ private fun Cell(
         textAlign = TextAlign.End,
         modifier =
             Modifier
-                .width(width)
+                .weight(1f)
                 .padding(vertical = 8.dp, horizontal = 4.dp),
     )
 }
