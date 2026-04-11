@@ -55,9 +55,9 @@ fun HelpScreen(onBack: () -> Unit) {
                         "Balance projections at 1/3/6/12 months, survival time, and final day.",
                 )
                 HelpText("Filter with the top selector:")
-                BulletItem("all", "Expenses and income", MaterialTheme.colorScheme.onSurface)
-                BulletItem("expense", "Expenses only", ExpenseRed)
-                BulletItem("income", "Income only", IncomeGreen)
+                BulletItem("All", "Expenses and income", MaterialTheme.colorScheme.onSurface)
+                BulletItem("Expense", "Expenses only", ExpenseRed)
+                BulletItem("Income", "Income only", IncomeGreen)
                 HelpText("Coverage bar at the bottom shows years covered, colored by reliability.")
             }
 

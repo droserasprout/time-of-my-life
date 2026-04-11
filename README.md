@@ -1,13 +1,8 @@
 # Time of My Life
 
-Opinionated budget planner for Android.
-Answers one question:
-**how long can you live on your current savings?**
+Opinionated budget planner for Android. Answers one question: **how long can you live on your current savings?**
 
-Enter your balances and monthly budget, and the app computes
-how many months your money lasts across six scenarios — from
-your most reliable assets in the worst case to everything you
-own with an optimistic budget.
+Enter your balances and monthly budget, and the app computes how many months your money lasts across six scenarios — from your most reliable assets in the worst case (danger zone!) to everything you own with an optimistic budget (dream scenario).
 
 All data is stored locally. No network access, no accounts. Make backups!
 
@@ -57,7 +52,6 @@ make test
 make all
 ```
 
-Requires Android SDK (`ANDROID_HOME`) and JDK 21 (`JAVA_HOME`).
-See `Makefile` for defaults.
+Requires Android SDK (set `ANDROID_HOME`) and JDK 21 (set `JAVA_HOME`). See `Makefile` for defaults.
 
 Minimum SDK: 26 (Android 8.0). Target SDK: 35.
