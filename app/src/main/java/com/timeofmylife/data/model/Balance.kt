@@ -10,5 +10,5 @@ data class Balance(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
     val reliability: Reliability,
-    val amount: Double
+    val amount: Double,
 )

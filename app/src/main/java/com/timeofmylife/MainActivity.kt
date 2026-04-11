@@ -11,9 +11,9 @@ import androidx.compose.ui.Modifier
 import com.timeofmylife.ui.AppNavigation
 import com.timeofmylife.ui.LocalDemoMode
 import com.timeofmylife.ui.LocalSetDemoMode
+import com.timeofmylife.ui.help.HelpScreen
 import com.timeofmylife.ui.isDemoMode
 import com.timeofmylife.ui.persistDemoMode
-import com.timeofmylife.ui.help.HelpScreen
 import com.timeofmylife.ui.theme.TimeOfMyLifeTheme
 import com.timeofmylife.ui.welcome.WelcomeScreen
 import com.timeofmylife.ui.welcome.hasSeenWelcome
@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
                     LocalSetDemoMode provides { enabled ->
                         demoMode = enabled
                         persistDemoMode(ctx, enabled)
-                    }
+                    },
                 ) {
                     var showWelcome by remember { mutableStateOf(!hasSeenWelcome(ctx)) }
                     var showHelp by remember { mutableStateOf(false) }
@@ -40,14 +40,14 @@ class MainActivity : ComponentActivity() {
                         AppNavigation(
                             repository,
                             onShowWelcome = { showWelcome = true },
-                            onShowHelp = { showHelp = true }
+                            onShowHelp = { showHelp = true },
                         )
                         if (showHelp) {
                             HelpScreen(onBack = { showHelp = false })
                         } else if (showWelcome) {
                             WelcomeScreen(
                                 onGetStarted = { showWelcome = false },
-                                onShowHelp = { showHelp = true }
+                                onShowHelp = { showHelp = true },
                             )
                         }
                     }

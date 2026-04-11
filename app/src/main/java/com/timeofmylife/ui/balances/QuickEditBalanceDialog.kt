@@ -9,13 +9,13 @@ fun QuickEditBalanceDialog(
     balance: Balance,
     onSave: (Balance) -> Unit,
     onFullEdit: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     QuickEditDialog(
         title = balance.name,
         initialValue = balance.amount.toString(),
         onSave = { amount -> onSave(balance.copy(amount = amount)) },
         onFullEdit = onFullEdit,
-        onDismiss = onDismiss
+        onDismiss = onDismiss,
     )
 }

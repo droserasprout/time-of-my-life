@@ -25,8 +25,7 @@ import com.timeofmylife.ui.theme.WorstOrange
 private const val PREFS_NAME = "welcome"
 private const val KEY_SEEN = "seen"
 
-fun hasSeenWelcome(context: Context): Boolean =
-    context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).getBoolean(KEY_SEEN, false)
+fun hasSeenWelcome(context: Context): Boolean = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).getBoolean(KEY_SEEN, false)
 
 fun markWelcomeSeen(context: Context) {
     context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -34,7 +33,10 @@ fun markWelcomeSeen(context: Context) {
 }
 
 @Composable
-fun WelcomeScreen(onGetStarted: () -> Unit, onShowHelp: () -> Unit) {
+fun WelcomeScreen(
+    onGetStarted: () -> Unit,
+    onShowHelp: () -> Unit,
+) {
     val context = LocalContext.current
     if (hasSeenWelcome(context)) {
         BackHandler(onBack = onGetStarted)
@@ -42,60 +44,63 @@ fun WelcomeScreen(onGetStarted: () -> Unit, onShowHelp: () -> Unit) {
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 32.dp, vertical = 48.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 32.dp, vertical = 48.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-          Column(
-              modifier = Modifier
-                  .weight(1f)
-                  .verticalScroll(rememberScrollState()),
-              horizontalAlignment = Alignment.CenterHorizontally,
-              verticalArrangement = Arrangement.Center
-          ) {
-            Text(
-                "Time of My Life",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-            Spacer(Modifier.height(8.dp))
-            Text(
-                "How long can you live on your savings?",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            )
+            Column(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Text(
+                    "Time of My Life",
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "How long can you live on your savings?",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
 
-            Spacer(Modifier.height(40.dp))
+                Spacer(Modifier.height(40.dp))
 
-            ConceptCard(
-                icon = Icons.Default.AccountBalance,
-                title = "Balances",
-                description = "Add your assets and rate their reliability: high (cash, bank accounts), medium (broker accounts), or low (crypto, debts).",
-                accentColor = HighColor
-            )
-            Spacer(Modifier.height(16.dp))
-            ConceptCard(
-                icon = Icons.Default.AttachMoney,
-                title = "Budget",
-                description = "Enter monthly expenses and income with three estimates: best case, last month actual, and worst case.",
-                accentColor = BestBlue
-            )
-            Spacer(Modifier.height(16.dp))
-            ConceptCard(
-                icon = Icons.Default.Timeline,
-                title = "Life Time",
-                description = "See how long your money lasts across six scenarios combining asset reliability with budget estimates.",
-                accentColor = WorstOrange
-            )
-
-          }
+                ConceptCard(
+                    icon = Icons.Default.AccountBalance,
+                    title = "Balances",
+                    description =
+                        "Add your assets and rate their reliability: high (cash, bank accounts), " +
+                            "medium (broker accounts), or low (crypto, debts).",
+                    accentColor = HighColor,
+                )
+                Spacer(Modifier.height(16.dp))
+                ConceptCard(
+                    icon = Icons.Default.AttachMoney,
+                    title = "Budget",
+                    description = "Enter monthly expenses and income with three estimates: best case, last month actual, and worst case.",
+                    accentColor = BestBlue,
+                )
+                Spacer(Modifier.height(16.dp))
+                ConceptCard(
+                    icon = Icons.Default.Timeline,
+                    title = "Life Time",
+                    description = "See how long your money lasts across six scenarios combining asset reliability with budget estimates.",
+                    accentColor = WorstOrange,
+                )
+            }
 
             OutlinedButton(
                 onClick = onShowHelp,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Show help")
             }
@@ -105,7 +110,7 @@ fun WelcomeScreen(onGetStarted: () -> Unit, onShowHelp: () -> Unit) {
                     markWelcomeSeen(context)
                     onGetStarted()
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Get started")
             }
@@ -118,18 +123,18 @@ private fun ConceptCard(
     icon: ImageVector,
     title: String,
     description: String,
-    accentColor: androidx.compose.ui.graphics.Color
+    accentColor: androidx.compose.ui.graphics.Color,
 ) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.Top
+            verticalAlignment = Alignment.Top,
         ) {
             Icon(
                 icon,
                 contentDescription = null,
                 tint = accentColor,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(32.dp),
             )
             Spacer(Modifier.width(16.dp))
             Column {

@@ -17,26 +17,27 @@ fun ItemCard(
     borderColor: Color,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
-    content: @Composable RowScope.() -> Unit
+    content: @Composable RowScope.() -> Unit,
 ) {
     Surface(
         shape = MaterialTheme.shapes.medium,
         tonalElevation = 1.dp,
-        modifier = modifier.fillMaxWidth().then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+        modifier = modifier.fillMaxWidth().then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .drawBehind {
-                    drawRect(
-                        color = borderColor,
-                        size = androidx.compose.ui.geometry.Size(CardBorderWidth.toPx(), size.height)
-                    )
-                }
-                .padding(start = 16.dp, end = 12.dp, top = 10.dp, bottom = 10.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .drawBehind {
+                        drawRect(
+                            color = borderColor,
+                            size = androidx.compose.ui.geometry.Size(CardBorderWidth.toPx(), size.height),
+                        )
+                    }
+                    .padding(start = 16.dp, end = 12.dp, top = 10.dp, bottom = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            content = content
+            content = content,
         )
     }
 }

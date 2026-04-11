@@ -8,46 +8,65 @@ data class LifetimeRow(
     val balance3m: Double,
     val balance6m: Double,
     val balance12m: Double,
-    val monthsLeft: Double   // Double.POSITIVE_INFINITY means income >= expenses
+    // Double.POSITIVE_INFINITY means income >= expenses
+    val monthsLeft: Double,
 )
 
 object LifetimeCalculator {
-
     private data class ScenarioDef(
         val tiers: Set<Reliability>,
         val useBest: Boolean,
-        val label: String
+        val label: String,
     )
 
-    private val SCENARIOS = listOf(
-        ScenarioDef(setOf(Reliability.HIGH), false, "high / worst"),
-        ScenarioDef(setOf(Reliability.HIGH), true, "high / best"),
-        ScenarioDef(setOf(Reliability.HIGH, Reliability.MEDIUM), false, "medium / worst"),
-        ScenarioDef(setOf(Reliability.HIGH, Reliability.MEDIUM), true, "medium / best"),
-        ScenarioDef(setOf(Reliability.HIGH, Reliability.MEDIUM, Reliability.LOW), false, "low / worst"),
-        ScenarioDef(setOf(Reliability.HIGH, Reliability.MEDIUM, Reliability.LOW), true, "low / best"),
-    )
+    private val SCENARIOS =
+        listOf(
+            ScenarioDef(setOf(Reliability.HIGH), false, "high / worst"),
+            ScenarioDef(setOf(Reliability.HIGH), true, "high / best"),
+            ScenarioDef(setOf(Reliability.HIGH, Reliability.MEDIUM), false, "medium / worst"),
+            ScenarioDef(setOf(Reliability.HIGH, Reliability.MEDIUM), true, "medium / best"),
+            ScenarioDef(setOf(Reliability.HIGH, Reliability.MEDIUM, Reliability.LOW), false, "low / worst"),
+            ScenarioDef(setOf(Reliability.HIGH, Reliability.MEDIUM, Reliability.LOW), true, "low / best"),
+        )
 
-    fun calculate(balances: List<Balance>, budgetItems: List<BudgetItem>, includeIncome: Boolean = true, includeExpenses: Boolean = true): List<LifetimeRow> =
+    fun calculate(
+        balances: List<Balance>,
+        budgetItems: List<BudgetItem>,
+        includeIncome: Boolean = true,
+        includeExpenses: Boolean = true,
+    ): List<LifetimeRow> =
         SCENARIOS.map { scenario ->
-            val totalBalance = balances
-                .filter { it.reliability in scenario.tiers }
-                .sumOf { it.amount }
+            val totalBalance =
+                balances
+                    .filter { it.reliability in scenario.tiers }
+                    .sumOf { it.amount }
 
-            val totalExpenses = if (includeExpenses) budgetItems
-                .filter { it.type == ItemType.EXPENSE }
-                .sumOf { if (scenario.useBest) it.bestAmount else it.worstAmount }
-            else 0.0
+            val totalExpenses =
+                if (includeExpenses) {
+                    budgetItems
+                        .filter { it.type == ItemType.EXPENSE }
+                        .sumOf { if (scenario.useBest) it.bestAmount else it.worstAmount }
+                } else {
+                    0.0
+                }
 
-            val totalIncomes = if (includeIncome) budgetItems
-                .filter { it.type == ItemType.INCOME }
-                .sumOf { if (scenario.useBest) it.bestAmount else it.worstAmount }
-            else 0.0
+            val totalIncomes =
+                if (includeIncome) {
+                    budgetItems
+                        .filter { it.type == ItemType.INCOME }
+                        .sumOf { if (scenario.useBest) it.bestAmount else it.worstAmount }
+                } else {
+                    0.0
+                }
 
             val netBurn = totalExpenses - totalIncomes
 
-            val monthsLeft = if (netBurn <= 0) Double.POSITIVE_INFINITY
-                             else totalBalance / netBurn
+            val monthsLeft =
+                if (netBurn <= 0) {
+                    Double.POSITIVE_INFINITY
+                } else {
+                    totalBalance / netBurn
+                }
 
             LifetimeRow(
                 label = scenario.label,
@@ -55,7 +74,7 @@ object LifetimeCalculator {
                 balance3m = totalBalance - netBurn * 3,
                 balance6m = totalBalance - netBurn * 6,
                 balance12m = totalBalance - netBurn * 12,
-                monthsLeft = monthsLeft
+                monthsLeft = monthsLeft,
             )
         }
 }

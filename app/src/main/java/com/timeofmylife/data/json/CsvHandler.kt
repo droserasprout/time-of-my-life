@@ -7,7 +7,11 @@ import com.timeofmylife.data.model.BudgetItem
 import com.timeofmylife.data.model.ItemType
 import com.timeofmylife.data.model.Reliability
 
-fun writeBalancesCsv(context: Context, uri: Uri, balances: List<Balance>) {
+fun writeBalancesCsv(
+    context: Context,
+    uri: Uri,
+    balances: List<Balance>,
+) {
     context.contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { w ->
         w.write("name,reliability,amount")
         w.newLine()
@@ -18,7 +22,11 @@ fun writeBalancesCsv(context: Context, uri: Uri, balances: List<Balance>) {
     }
 }
 
-fun writeBudgetItemsCsv(context: Context, uri: Uri, budgetItems: List<BudgetItem>) {
+fun writeBudgetItemsCsv(
+    context: Context,
+    uri: Uri,
+    budgetItems: List<BudgetItem>,
+) {
     context.contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { w ->
         w.write("name,type,bestAmount,worstAmount,lastAmount")
         w.newLine()
@@ -29,20 +37,26 @@ fun writeBudgetItemsCsv(context: Context, uri: Uri, budgetItems: List<BudgetItem
     }
 }
 
-fun readBalancesCsv(context: Context, uri: Uri): List<Balance> {
+fun readBalancesCsv(
+    context: Context,
+    uri: Uri,
+): List<Balance> {
     return context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { r ->
         r.readLines().drop(1).filter { it.isNotBlank() }.map { line ->
             val cols = parseCsvLine(line)
             Balance(
                 name = cols[0],
                 reliability = Reliability.valueOf(cols[1]),
-                amount = cols[2].toDouble()
+                amount = cols[2].toDouble(),
             )
         }
     } ?: emptyList()
 }
 
-fun readBudgetItemsCsv(context: Context, uri: Uri): List<BudgetItem> {
+fun readBudgetItemsCsv(
+    context: Context,
+    uri: Uri,
+): List<BudgetItem> {
     return context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { r ->
         r.readLines().drop(1).filter { it.isNotBlank() }.map { line ->
             val cols = parseCsvLine(line)
@@ -51,16 +65,18 @@ fun readBudgetItemsCsv(context: Context, uri: Uri): List<BudgetItem> {
                 type = ItemType.valueOf(cols[1]),
                 bestAmount = cols[2].toDouble(),
                 worstAmount = cols[3].toDouble(),
-                lastAmount = cols.getOrElse(4) { "0.0" }.toDouble()
+                lastAmount = cols.getOrElse(4) { "0.0" }.toDouble(),
             )
         }
     } ?: emptyList()
 }
 
 private fun escapeCsv(value: String): String =
-    if (value.contains(',') || value.contains('"') || value.contains('\n'))
+    if (value.contains(',') || value.contains('"') || value.contains('\n')) {
         "\"${value.replace("\"", "\"\"")}\""
-    else value
+    } else {
+        value
+    }
 
 private fun parseCsvLine(line: String): List<String> {
     val result = mutableListOf<String>()

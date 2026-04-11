@@ -18,14 +18,15 @@ fun <T> SegmentedSelector(
     selected: T,
     onSelect: (T) -> Unit,
     label: (T) -> String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         options.forEachIndexed { index, option ->
             if (index > 0) {
@@ -33,29 +34,38 @@ fun <T> SegmentedSelector(
                     "|",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                    modifier = Modifier.padding(horizontal = 8.dp),
                 )
             }
             val isSelected = option == selected
             Text(
                 text = label(option),
                 style = MaterialTheme.typography.labelMedium,
-                color = if (isSelected) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .clickable { onSelect(option) }
-                    .then(
-                        if (isSelected) Modifier.drawBehind {
-                            val strokeWidth = 2.dp.toPx()
-                            drawLine(
-                                color = Accent,
-                                start = Offset(0f, size.height),
-                                end = Offset(size.width, size.height),
-                                strokeWidth = strokeWidth
-                            )
-                        } else Modifier
-                    )
-                    .padding(vertical = 4.dp, horizontal = 2.dp)
+                color =
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+                modifier =
+                    Modifier
+                        .clickable { onSelect(option) }
+                        .then(
+                            if (isSelected) {
+                                Modifier.drawBehind {
+                                    val strokeWidth = 2.dp.toPx()
+                                    drawLine(
+                                        color = Accent,
+                                        start = Offset(0f, size.height),
+                                        end = Offset(size.width, size.height),
+                                        strokeWidth = strokeWidth,
+                                    )
+                                }
+                            } else {
+                                Modifier
+                            },
+                        )
+                        .padding(vertical = 4.dp, horizontal = 2.dp),
             )
         }
     }

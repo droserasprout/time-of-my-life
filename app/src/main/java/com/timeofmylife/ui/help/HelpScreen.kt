@@ -16,15 +16,17 @@ fun HelpScreen(onBack: () -> Unit) {
     BackHandler(onBack = onBack)
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 24.dp)
-                .padding(top = 48.dp, bottom = 32.dp)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 48.dp, bottom = 32.dp),
         ) {
             Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
             ) {
                 Text("Help", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(24.dp))
@@ -42,11 +44,16 @@ fun HelpScreen(onBack: () -> Unit) {
                 BulletItem("Best", "Optimistic", BestBlue)
                 BulletItem("Last", "Actual last month", LastGrey)
                 BulletItem("Worst", "Pessimistic", WorstOrange)
-                HelpText("Tap an amount to quick-edit it. Tap item name to edit or delete. Sort by a-z, avg, or last; tap again to reverse.")
+                HelpText(
+                    "Tap an amount to quick-edit it. Tap item name to edit or delete. Sort by a-z, avg, or last; tap again to reverse.",
+                )
                 Spacer(Modifier.height(16.dp))
 
                 SectionTitle("Life Time")
-                HelpText("Six scenarios: three reliability tiers crossed with best/worst budget. Balance projections at 1/3/6/12 months, survival time, and final day.")
+                HelpText(
+                    "Six scenarios: three reliability tiers crossed with best/worst budget. " +
+                        "Balance projections at 1/3/6/12 months, survival time, and final day.",
+                )
                 HelpText("Filter with the top selector:")
                 BulletItem("all", "Expenses and income", MaterialTheme.colorScheme.onSurface)
                 BulletItem("expense", "Expenses only", ExpenseRed)
@@ -57,7 +64,7 @@ fun HelpScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(16.dp))
             Button(
                 onClick = onBack,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Back")
             }
@@ -71,7 +78,7 @@ private fun SectionTitle(text: String) {
         text,
         style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.SemiBold,
-        modifier = Modifier.padding(bottom = 4.dp)
+        modifier = Modifier.padding(bottom = 4.dp),
     )
 }
 
@@ -81,12 +88,16 @@ private fun HelpText(text: String) {
         text,
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(vertical = 2.dp)
+        modifier = Modifier.padding(vertical = 2.dp),
     )
 }
 
 @Composable
-private fun BulletItem(label: String, description: String, color: androidx.compose.ui.graphics.Color) {
+private fun BulletItem(
+    label: String,
+    description: String,
+    color: androidx.compose.ui.graphics.Color,
+) {
     Row(modifier = Modifier.padding(start = 8.dp, top = 2.dp, bottom = 2.dp)) {
         Text("  ", style = MaterialTheme.typography.bodyMedium)
         Text(label, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = color)

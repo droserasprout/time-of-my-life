@@ -3,7 +3,6 @@ package com.timeofmylife.ui.budget
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import com.timeofmylife.ui.theme.DialogCornerRadius
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -12,13 +11,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.timeofmylife.data.model.BudgetItem
 import com.timeofmylife.data.model.ItemType
+import com.timeofmylife.ui.theme.DialogCornerRadius
 
 @Composable
 fun AddEditBudgetItemDialog(
     initial: BudgetItem?,
     onConfirm: (BudgetItem) -> Unit,
     onDelete: (() -> Unit)? = null,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     var name by remember { mutableStateOf(initial?.name ?: "") }
     var type by remember { mutableStateOf(initial?.type ?: ItemType.EXPENSE) }
@@ -31,14 +31,14 @@ fun AddEditBudgetItemDialog(
             Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
                     if (initial == null) "Add budget item" else "Edit budget item",
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
                 )
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Name") },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
                 )
                 Text("Type", style = MaterialTheme.typography.labelMedium)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -46,7 +46,7 @@ fun AddEditBudgetItemDialog(
                         FilterChip(
                             selected = type == t,
                             onClick = { type = t },
-                            label = { Text(t.name.lowercase()) }
+                            label = { Text(t.name.lowercase()) },
                         )
                     }
                 }
@@ -56,7 +56,7 @@ fun AddEditBudgetItemDialog(
                     label = { Text("Best amount") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true
+                    singleLine = true,
                 )
                 OutlinedTextField(
                     value = worstText,
@@ -64,7 +64,7 @@ fun AddEditBudgetItemDialog(
                     label = { Text("Worst amount") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true
+                    singleLine = true,
                 )
                 OutlinedTextField(
                     value = lastText,
@@ -72,17 +72,17 @@ fun AddEditBudgetItemDialog(
                     label = { Text("Last month") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true
+                    singleLine = true,
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     // Delete on the left, only in edit mode
                     if (onDelete != null) {
                         TextButton(
                             onClick = onDelete,
-                            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
                         ) { Text("Delete") }
                     } else {
                         Spacer(Modifier.weight(1f))
@@ -95,8 +95,17 @@ fun AddEditBudgetItemDialog(
                                 val bad = worstText.toDoubleOrNull() ?: return@TextButton
                                 if (name.isBlank()) return@TextButton
                                 val last = lastText.toDoubleOrNull() ?: 0.0
-                                onConfirm(BudgetItem(id = initial?.id ?: 0, name = name.trim(), type = type, bestAmount = good, worstAmount = bad, lastAmount = last))
-                            }
+                                onConfirm(
+                                    BudgetItem(
+                                        id = initial?.id ?: 0,
+                                        name = name.trim(),
+                                        type = type,
+                                        bestAmount = good,
+                                        worstAmount = bad,
+                                        lastAmount = last,
+                                    ),
+                                )
+                            },
                         ) { Text("Save") }
                     }
                 }

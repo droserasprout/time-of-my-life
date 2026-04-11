@@ -42,8 +42,14 @@ That's all! Works for me, might work for you too.
 make build
 # Install on connected device
 make install
+# Lint (ktlint + detekt + markdownlint)
+make lint
+# Format Kotlin sources
+make format
 # Unit tests
 make test
+# Run all checks
+make all
 ```
 
 Requires Android SDK (set `ANDROID_HOME`) and JDK 17 (set `JAVA_HOME`). See `Makefile` for defaults.

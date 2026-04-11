@@ -12,5 +12,5 @@ data class BudgetItem(
     val type: ItemType,
     val bestAmount: Double,
     val worstAmount: Double,
-    val lastAmount: Double = 0.0
+    val lastAmount: Double = 0.0,
 )

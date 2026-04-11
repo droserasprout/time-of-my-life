@@ -22,7 +22,7 @@ fun QuickEditDialog(
     initialValue: String,
     onSave: (Double) -> Unit,
     onFullEdit: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     var field by remember {
         mutableStateOf(TextFieldValue(initialValue, TextRange(0, initialValue.length)))
@@ -47,12 +47,12 @@ fun QuickEditDialog(
                     modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     keyboardActions = KeyboardActions(onDone = { save() }),
-                    singleLine = true
+                    singleLine = true,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     TextButton(onClick = onFullEdit) { Text("Edit") }
                     Row {

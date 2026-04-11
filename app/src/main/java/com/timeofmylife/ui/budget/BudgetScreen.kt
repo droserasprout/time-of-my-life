@@ -30,7 +30,10 @@ import com.timeofmylife.ui.theme.*
 enum class BudgetColumn { BEST, LAST, WORST }
 
 @Composable
-fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
+fun BudgetScreen(
+    repository: FinanceRepository,
+    innerPadding: PaddingValues,
+) {
     val vm: BudgetViewModel = viewModel(factory = BudgetViewModel.Factory(repository))
     val items by vm.items.collectAsStateWithLifecycle()
     val sortOrder by vm.sortOrder.collectAsStateWithLifecycle()
@@ -53,11 +56,17 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
             // Totals panel
             if (items.isNotEmpty()) {
                 TotalsCard(
-                    expenseBest, expenseWorst, expenseLast,
-                    incomeBest, incomeWorst, incomeLast,
-                    modifier = Modifier.padding(
-                        start = ScreenHorizontalPadding, end = ScreenHorizontalPadding
-                    )
+                    expenseBest,
+                    expenseWorst,
+                    expenseLast,
+                    incomeBest,
+                    incomeWorst,
+                    incomeLast,
+                    modifier =
+                        Modifier.padding(
+                            start = ScreenHorizontalPadding,
+                            end = ScreenHorizontalPadding,
+                        ),
                 )
             }
 
@@ -67,23 +76,30 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                 selected = sortOrder,
                 onSelect = { vm.setSortOrder(it) },
                 label = { order ->
-                    val arrow = if (order == sortOrder) { if (ascending) " \u25B2" else " \u25BC" } else ""
+                    val arrow =
+                        if (order == sortOrder) {
+                            if (ascending) " \u25B2" else " \u25BC"
+                        } else {
+                            ""
+                        }
                     when (order) {
                         SortOrder.ALPHA -> "a-z$arrow"
                         SortOrder.AVG -> "avg$arrow"
                         SortOrder.LAST -> "last$arrow"
                     }
-                }
+                },
             )
 
             LazyColumn(
-                contentPadding = PaddingValues(
-                    top = ItemSpacing,
-                    bottom = innerPadding.calculateBottomPadding() + FabBottomClearance,
-                    start = ScreenHorizontalPadding, end = ScreenHorizontalPadding
-                ),
+                contentPadding =
+                    PaddingValues(
+                        top = ItemSpacing,
+                        bottom = innerPadding.calculateBottomPadding() + FabBottomClearance,
+                        start = ScreenHorizontalPadding,
+                        end = ScreenHorizontalPadding,
+                    ),
                 verticalArrangement = Arrangement.spacedBy(ItemSpacing),
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             ) {
                 if (expenses.isNotEmpty()) {
                     item { SectionHeader("Expenses", ExpenseRed) }
@@ -91,7 +107,7 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                         BudgetItemRow(
                             item = item,
                             onColumnClick = { col -> quickEditTarget = item to col },
-                            onNameClick = { editTarget = item }
+                            onNameClick = { editTarget = item },
                         )
                     }
                 }
@@ -101,7 +117,7 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
                         BudgetItemRow(
                             item = item,
                             onColumnClick = { col -> quickEditTarget = item to col },
-                            onNameClick = { editTarget = item }
+                            onNameClick = { editTarget = item },
                         )
                     }
                 }
@@ -110,9 +126,10 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
 
         FloatingActionButton(
             onClick = { showAddDialog = true },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = ScreenHorizontalPadding, bottom = innerPadding.calculateBottomPadding() + ScreenHorizontalPadding)
+            modifier =
+                Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = ScreenHorizontalPadding, bottom = innerPadding.calculateBottomPadding() + ScreenHorizontalPadding),
         ) {
             Icon(Icons.Default.Add, contentDescription = "Add budget item")
         }
@@ -121,53 +138,72 @@ fun BudgetScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     if (showAddDialog) {
         AddEditBudgetItemDialog(
             initial = null,
-            onConfirm = { vm.upsert(it); showAddDialog = false },
-            onDismiss = { showAddDialog = false }
+            onConfirm = {
+                vm.upsert(it)
+                showAddDialog = false
+            },
+            onDismiss = { showAddDialog = false },
         )
     }
     editTarget?.let { target ->
         AddEditBudgetItemDialog(
             initial = target,
-            onConfirm = { vm.upsert(it); editTarget = null },
-            onDelete = { vm.delete(target); editTarget = null },
-            onDismiss = { editTarget = null }
+            onConfirm = {
+                vm.upsert(it)
+                editTarget = null
+            },
+            onDelete = {
+                vm.delete(target)
+                editTarget = null
+            },
+            onDismiss = { editTarget = null },
         )
     }
     quickEditTarget?.let { (target, column) ->
-        val columnLabel = when (column) {
-            BudgetColumn.BEST -> "best"
-            BudgetColumn.LAST -> "last"
-            BudgetColumn.WORST -> "worst"
-        }
-        val initialValue = when (column) {
-            BudgetColumn.BEST -> target.bestAmount
-            BudgetColumn.LAST -> target.lastAmount
-            BudgetColumn.WORST -> target.worstAmount
-        }
+        val columnLabel =
+            when (column) {
+                BudgetColumn.BEST -> "best"
+                BudgetColumn.LAST -> "last"
+                BudgetColumn.WORST -> "worst"
+            }
+        val initialValue =
+            when (column) {
+                BudgetColumn.BEST -> target.bestAmount
+                BudgetColumn.LAST -> target.lastAmount
+                BudgetColumn.WORST -> target.worstAmount
+            }
         QuickEditDialog(
             title = "${target.name} | $columnLabel",
             initialValue = if (initialValue == 0.0) "" else initialValue.toString(),
             onSave = { amount ->
-                val updated = when (column) {
-                    BudgetColumn.BEST -> target.copy(bestAmount = amount)
-                    BudgetColumn.LAST -> target.copy(lastAmount = amount)
-                    BudgetColumn.WORST -> target.copy(worstAmount = amount)
-                }
-                vm.upsert(updated); quickEditTarget = null
+                val updated =
+                    when (column) {
+                        BudgetColumn.BEST -> target.copy(bestAmount = amount)
+                        BudgetColumn.LAST -> target.copy(lastAmount = amount)
+                        BudgetColumn.WORST -> target.copy(worstAmount = amount)
+                    }
+                vm.upsert(updated)
+                quickEditTarget = null
             },
-            onFullEdit = { quickEditTarget = null; editTarget = target },
-            onDismiss = { quickEditTarget = null }
+            onFullEdit = {
+                quickEditTarget = null
+                editTarget = target
+            },
+            onDismiss = { quickEditTarget = null },
         )
     }
 }
 
 @Composable
-private fun SectionHeader(label: String, color: Color) {
+private fun SectionHeader(
+    label: String,
+    color: Color,
+) {
     Text(
         label,
         style = MaterialTheme.typography.labelMedium,
         color = color,
-        modifier = Modifier.padding(vertical = 4.dp)
+        modifier = Modifier.padding(vertical = 4.dp),
     )
 }
 
@@ -179,7 +215,7 @@ private fun TotalsCard(
     incomeBest: Double,
     incomeWorst: Double,
     incomeLast: Double,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val netBest = incomeBest - expenseBest
     val netWorst = incomeWorst - expenseWorst
@@ -189,9 +225,27 @@ private fun TotalsCard(
         Row(modifier = Modifier.fillMaxWidth()) {
             Spacer(modifier = Modifier.weight(1f))
             val headerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-            Text("best", style = MaterialTheme.typography.labelSmall, color = headerColor, textAlign = TextAlign.End, modifier = Modifier.width(AmountColumnWidth))
-            Text("last", style = MaterialTheme.typography.labelSmall, color = headerColor, textAlign = TextAlign.End, modifier = Modifier.width(AmountColumnWidth))
-            Text("worst", style = MaterialTheme.typography.labelSmall, color = headerColor, textAlign = TextAlign.End, modifier = Modifier.width(AmountColumnWidth))
+            Text(
+                "best",
+                style = MaterialTheme.typography.labelSmall,
+                color = headerColor,
+                textAlign = TextAlign.End,
+                modifier = Modifier.width(AmountColumnWidth),
+            )
+            Text(
+                "last",
+                style = MaterialTheme.typography.labelSmall,
+                color = headerColor,
+                textAlign = TextAlign.End,
+                modifier = Modifier.width(AmountColumnWidth),
+            )
+            Text(
+                "worst",
+                style = MaterialTheme.typography.labelSmall,
+                color = headerColor,
+                textAlign = TextAlign.End,
+                modifier = Modifier.width(AmountColumnWidth),
+            )
         }
         TotalsRow("Expenses", expenseBest, expenseWorst, expenseLast, ExpenseRed)
         TotalsRow("Income", incomeBest, incomeWorst, incomeLast, IncomeGreen)
@@ -199,7 +253,7 @@ private fun TotalsCard(
         // Accuracy bar matching row layout
         Row(
             modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Spacer(modifier = Modifier.weight(1f))
             TickBar(best = netBest, worst = netWorst, last = netLast, modifier = Modifier.width(AmountColumnWidth * 3))
@@ -219,53 +273,122 @@ private fun TotalsRow(
     val demo = LocalDemoMode.current
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(label, style = MaterialTheme.typography.bodyMedium, color = labelColor, modifier = Modifier.weight(1f))
-        Text(formatAmount(best, demo), style = MaterialTheme.typography.bodySmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AmountColumnWidth))
-        Text(formatAmount(last, demo), style = MaterialTheme.typography.bodySmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AmountColumnWidth))
-        Text(formatAmount(worst, demo), style = MaterialTheme.typography.bodySmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AmountColumnWidth))
+        Text(
+            formatAmount(best, demo),
+            style = MaterialTheme.typography.bodySmall,
+            color = BestBlue,
+            textAlign = TextAlign.End,
+            modifier = Modifier.width(AmountColumnWidth),
+        )
+        Text(
+            formatAmount(last, demo),
+            style = MaterialTheme.typography.bodySmall,
+            color = LastGrey,
+            textAlign = TextAlign.End,
+            modifier = Modifier.width(AmountColumnWidth),
+        )
+        Text(
+            formatAmount(worst, demo),
+            style = MaterialTheme.typography.bodySmall,
+            color = WorstOrange,
+            textAlign = TextAlign.End,
+            modifier = Modifier.width(AmountColumnWidth),
+        )
     }
 }
 
 @Composable
-private fun TickBar(best: Double, worst: Double, last: Double, modifier: Modifier = Modifier) {
+private fun TickBar(
+    best: Double,
+    worst: Double,
+    last: Double,
+    modifier: Modifier = Modifier,
+) {
     val range = worst - best
     val fraction = if (range != 0.0) ((last - best) / range).toFloat().coerceIn(0f, 1f) else 0.5f
     val barColor = LastGrey.copy(alpha = 0.3f)
     val tickColor = LastGrey
     Box(
-        modifier = modifier
-            .height(BarHeight)
-            .drawBehind {
-                drawLine(
-                    color = barColor,
-                    start = Offset(0f, size.height / 2),
-                    end = Offset(size.width, size.height / 2),
-                    strokeWidth = 2.dp.toPx()
-                )
-                val tickX = fraction * size.width
-                drawLine(
-                    color = tickColor,
-                    start = Offset(tickX, 0f),
-                    end = Offset(tickX, size.height),
-                    strokeWidth = 2.dp.toPx()
-                )
-            }
+        modifier =
+            modifier
+                .height(BarHeight)
+                .drawBehind {
+                    drawLine(
+                        color = barColor,
+                        start = Offset(0f, size.height / 2),
+                        end = Offset(size.width, size.height / 2),
+                        strokeWidth = 2.dp.toPx(),
+                    )
+                    val tickX = fraction * size.width
+                    drawLine(
+                        color = tickColor,
+                        start = Offset(tickX, 0f),
+                        end = Offset(tickX, size.height),
+                        strokeWidth = 2.dp.toPx(),
+                    )
+                },
     )
 }
 
-
 @Composable
-private fun BudgetItemRow(item: BudgetItem, onColumnClick: (BudgetColumn) -> Unit, onNameClick: () -> Unit) {
+private fun BudgetItemRow(
+    item: BudgetItem,
+    onColumnClick: (BudgetColumn) -> Unit,
+    onNameClick: () -> Unit,
+) {
     val borderColor = if (item.type == ItemType.EXPENSE) ExpenseRed else IncomeGreen
     ItemCard(borderColor = borderColor) {
         val demo = LocalDemoMode.current
         Text(item.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f).clickable(onClick = onNameClick))
         Row {
-            Text(formatAmount(item.bestAmount, demo), style = MaterialTheme.typography.bodySmall, color = BestBlue, textAlign = TextAlign.End, modifier = Modifier.width(AmountColumnWidth).clickable { onColumnClick(BudgetColumn.BEST) })
-            Text(formatAmount(item.lastAmount, demo), style = MaterialTheme.typography.bodySmall, color = LastGrey, textAlign = TextAlign.End, modifier = Modifier.width(AmountColumnWidth).clickable { onColumnClick(BudgetColumn.LAST) })
-            Text(formatAmount(item.worstAmount, demo), style = MaterialTheme.typography.bodySmall, color = WorstOrange, textAlign = TextAlign.End, modifier = Modifier.width(AmountColumnWidth).clickable { onColumnClick(BudgetColumn.WORST) })
+            Text(
+                formatAmount(
+                    item.bestAmount,
+                    demo,
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = BestBlue,
+                textAlign = TextAlign.End,
+                modifier =
+                    Modifier.width(
+                        AmountColumnWidth,
+                    ).clickable {
+                        onColumnClick(BudgetColumn.BEST)
+                    },
+            )
+            Text(
+                formatAmount(
+                    item.lastAmount,
+                    demo,
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = LastGrey,
+                textAlign = TextAlign.End,
+                modifier =
+                    Modifier.width(
+                        AmountColumnWidth,
+                    ).clickable {
+                        onColumnClick(BudgetColumn.LAST)
+                    },
+            )
+            Text(
+                formatAmount(
+                    item.worstAmount,
+                    demo,
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = WorstOrange,
+                textAlign = TextAlign.End,
+                modifier =
+                    Modifier.width(
+                        AmountColumnWidth,
+                    ).clickable {
+                        onColumnClick(BudgetColumn.WORST)
+                    },
+            )
         }
     }
 }

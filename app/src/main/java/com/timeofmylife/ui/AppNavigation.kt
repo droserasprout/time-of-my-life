@@ -24,8 +24,11 @@ import kotlinx.coroutines.launch
 
 sealed class Screen(val route: String, val label: String, val icon: ImageVector) {
     object Balances : Screen("balances", "Balances", Icons.Default.AccountBalance)
+
     object Budget : Screen("budget", "Budget", Icons.Default.AttachMoney)
+
     object Lifetime : Screen("lifetime", "Life Time", Icons.Default.Timeline)
+
     object Settings : Screen("settings", "Settings", Icons.Default.Settings)
 }
 
@@ -33,7 +36,11 @@ private val screens = listOf(Screen.Balances, Screen.Budget, Screen.Lifetime, Sc
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AppNavigation(repository: FinanceRepository, onShowWelcome: () -> Unit, onShowHelp: () -> Unit) {
+fun AppNavigation(
+    repository: FinanceRepository,
+    onShowWelcome: () -> Unit,
+    onShowHelp: () -> Unit,
+) {
     val pagerState = rememberPagerState(pageCount = { screens.size })
     val scope = rememberCoroutineScope()
 
@@ -45,18 +52,18 @@ fun AppNavigation(repository: FinanceRepository, onShowWelcome: () -> Unit, onSh
                         icon = { Icon(screen.icon, contentDescription = screen.label) },
                         label = { Text(screen.label) },
                         selected = pagerState.currentPage == index,
-                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } }
+                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
                     )
                 }
             }
-        }
+        },
     ) { innerPadding ->
         val pagePadding = PaddingValues(0.dp)
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.padding(innerPadding),
             beyondViewportPageCount = 1,
-            key = { screens[it].route }
+            key = { screens[it].route },
         ) { page ->
             when (page) {
                 0 -> BalancesScreen(repository, pagePadding)

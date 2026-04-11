@@ -9,13 +9,13 @@ fun QuickEditBudgetItemDialog(
     item: BudgetItem,
     onSave: (BudgetItem) -> Unit,
     onFullEdit: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     QuickEditDialog(
         title = item.name,
         initialValue = if (item.lastAmount == 0.0) "" else item.lastAmount.toString(),
         onSave = { amount -> onSave(item.copy(lastAmount = amount)) },
         onFullEdit = onFullEdit,
-        onDismiss = onDismiss
+        onDismiss = onDismiss,
     )
 }

@@ -31,12 +31,17 @@ clean:          ## Clean build artifacts
 ##
 
 all:            ## Run an entire CI pipeline
-	make test lint-docs
+	make lint test
 
 test:           ## Run tests
 	./gradlew test
 
-lint-docs:      ## Lint documentation
+lint:           ## Lint with all tools
+	./gradlew ktlintCheck detekt
 	markdownlint docs/
+	markdownlint *.md
+
+format:         ## Format Kotlin sources
+	./gradlew ktlintFormat
 
 ##

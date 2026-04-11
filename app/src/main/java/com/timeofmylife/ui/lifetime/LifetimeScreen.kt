@@ -14,7 +14,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import com.timeofmylife.ui.SegmentedSelector
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -27,6 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.domain.LifetimeRow
 import com.timeofmylife.ui.LocalDemoMode
+import com.timeofmylife.ui.SegmentedSelector
 import com.timeofmylife.ui.formatAmount
 import com.timeofmylife.ui.theme.*
 import java.time.LocalDate
@@ -38,26 +38,32 @@ private val BALANCE_COLUMNS = listOf("Scenario", "1m", "3m", "6m", "12m")
 private val SURVIVAL_COLUMNS = listOf("Scenario", "Time left", "Final Day")
 private val FINAL_DAY_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-private val RELIABILITY_COLORS = mapOf(
-    "high" to HighColor,
-    "medium" to MediumColor,
-    "low" to LowColor,
-)
-private val BUDGET_COLORS = mapOf(
-    "best" to BestBlue,
-    "worst" to WorstOrange,
-)
+private val RELIABILITY_COLORS =
+    mapOf(
+        "high" to HighColor,
+        "medium" to MediumColor,
+        "low" to LowColor,
+    )
+private val BUDGET_COLORS =
+    mapOf(
+        "best" to BestBlue,
+        "worst" to WorstOrange,
+    )
 
 @Composable
-fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
+fun LifetimeScreen(
+    repository: FinanceRepository,
+    innerPadding: PaddingValues,
+) {
     val vm: LifetimeViewModel = viewModel(factory = LifetimeViewModel.Factory(repository))
     val rows by vm.rows.collectAsStateWithLifecycle()
     val budgetMode by vm.budgetMode.collectAsStateWithLifecycle()
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = innerPadding.calculateTopPadding(), bottom = innerPadding.calculateBottomPadding())
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(top = innerPadding.calculateTopPadding(), bottom = innerPadding.calculateBottomPadding()),
     ) {
         // Coverage bar pinned to top
         LifetimeCoverageBar(rows)
@@ -67,14 +73,15 @@ fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
             options = BudgetMode.entries.toList(),
             selected = budgetMode,
             onSelect = { vm.setBudgetMode(it) },
-            label = { it.name.lowercase() }
+            label = { it.name.lowercase() },
         )
 
         // Scrollable tables
         Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
         ) {
             Column(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(16.dp)) {
                 Row {
@@ -107,35 +114,45 @@ fun LifetimeScreen(repository: FinanceRepository, innerPadding: PaddingValues) {
     }
 }
 
-
 @Composable
-private fun RowScope.SurvivalHeaderCell(text: String, isLabel: Boolean = false) {
+private fun RowScope.SurvivalHeaderCell(
+    text: String,
+    isLabel: Boolean = false,
+) {
     Text(
         text = text,
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
         textAlign = if (isLabel) TextAlign.Start else TextAlign.End,
-        modifier = Modifier
-            .weight(1f)
-            .padding(vertical = 6.dp, horizontal = 4.dp)
+        modifier =
+            Modifier
+                .weight(1f)
+                .padding(vertical = 6.dp, horizontal = 4.dp),
     )
 }
 
 @Composable
-private fun HeaderCell(text: String, width: Dp) {
+private fun HeaderCell(
+    text: String,
+    width: Dp,
+) {
     Text(
         text = text,
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
         textAlign = if (text == "Scenario") TextAlign.Start else TextAlign.End,
-        modifier = Modifier
-            .width(width)
-            .padding(vertical = 6.dp, horizontal = 4.dp)
+        modifier =
+            Modifier
+                .width(width)
+                .padding(vertical = 6.dp, horizontal = 4.dp),
     )
 }
 
 @Composable
-private fun ScenarioLabel(label: String, dotColor: Color) {
+private fun ScenarioLabel(
+    label: String,
+    dotColor: Color,
+) {
     val parts = label.split(" / ")
     val reliabilityPart = parts.getOrElse(0) { "" }
     val budgetPart = parts.getOrElse(1) { "" }
@@ -145,10 +162,11 @@ private fun ScenarioLabel(label: String, dotColor: Color) {
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(
-            modifier = Modifier
-                .size(8.dp)
-                .clip(CircleShape)
-                .background(dotColor)
+            modifier =
+                Modifier
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(dotColor),
         )
         Spacer(modifier = Modifier.width(6.dp))
         Text(
@@ -157,17 +175,20 @@ private fun ScenarioLabel(label: String, dotColor: Color) {
                 withStyle(SpanStyle(color = separatorColor)) { append(" / ") }
                 withStyle(SpanStyle(color = budgetColor)) { append(budgetPart) }
             },
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
         )
     }
 }
 
 @Composable
-private fun BalanceRow(row: LifetimeRow, dotColor: Color) {
+private fun BalanceRow(
+    row: LifetimeRow,
+    dotColor: Color,
+) {
     val demo = LocalDemoMode.current
     Row(
         modifier = Modifier.padding(vertical = 2.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(modifier = Modifier.width(120.dp).padding(vertical = 8.dp, horizontal = 4.dp)) {
             ScenarioLabel(row.label, dotColor)
@@ -180,23 +201,33 @@ private fun BalanceRow(row: LifetimeRow, dotColor: Color) {
 }
 
 @Composable
-private fun SurvivalRow(row: LifetimeRow, dotColor: Color) {
+private fun SurvivalRow(
+    row: LifetimeRow,
+    dotColor: Color,
+) {
     val months = row.monthsLeft
     val totalDays = if (months.isInfinite()) Long.MAX_VALUE else (months * 30.44).toLong()
-    val timeLeft = if (months.isInfinite()) "∞" else {
-        val m = totalDays / 30
-        val d = totalDays % 30
-        if (m > 0) "${m}m ${d}d" else "${d}d"
-    }
-    val finalDay = if (months.isInfinite()) "∞" else
-        LocalDate.now().plusDays(totalDays).format(FINAL_DAY_FMT)
+    val timeLeft =
+        if (months.isInfinite()) {
+            "∞"
+        } else {
+            val m = totalDays / 30
+            val d = totalDays % 30
+            if (m > 0) "${m}m ${d}d" else "${d}d"
+        }
+    val finalDay =
+        if (months.isInfinite()) {
+            "∞"
+        } else {
+            LocalDate.now().plusDays(totalDays).format(FINAL_DAY_FMT)
+        }
 
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
-            modifier = Modifier.weight(1f).padding(vertical = 8.dp, horizontal = 4.dp)
+            modifier = Modifier.weight(1f).padding(vertical = 8.dp, horizontal = 4.dp),
         ) {
             ScenarioLabel(row.label, dotColor)
         }
@@ -212,23 +243,28 @@ private fun RowScope.SurvivalCell(text: String) {
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurface,
         textAlign = TextAlign.End,
-        modifier = Modifier
-            .weight(1f)
-            .padding(vertical = 8.dp, horizontal = 4.dp)
+        modifier =
+            Modifier
+                .weight(1f)
+                .padding(vertical = 8.dp, horizontal = 4.dp),
     )
 }
 
 @Composable
-private fun Cell(text: String, width: Dp) {
+private fun Cell(
+    text: String,
+    width: Dp,
+) {
     val isNegative = text.startsWith("-")
     Text(
         text = text,
         style = MaterialTheme.typography.bodySmall,
         color = if (isNegative) NegativeText else MaterialTheme.colorScheme.onSurface,
         textAlign = TextAlign.End,
-        modifier = Modifier
-            .width(width)
-            .padding(vertical = 8.dp, horizontal = 4.dp)
+        modifier =
+            Modifier
+                .width(width)
+                .padding(vertical = 8.dp, horizontal = 4.dp),
     )
 }
 
@@ -237,14 +273,14 @@ private data class BarSegments(
     val medYears: Double,
     val lowYears: Double,
     val totalYears: Double,
-    val isInfinite: Boolean
+    val isInfinite: Boolean,
 )
 
 private fun computeBarSegments(
     rows: List<LifetimeRow>,
     highIdx: Int,
     medIdx: Int,
-    lowIdx: Int
+    lowIdx: Int,
 ): BarSegments {
     if (rows.size < 6) return BarSegments(0.0, 0.0, 0.0, 0.0, false)
 
@@ -275,12 +311,13 @@ private fun LifetimeCoverageBar(rows: List<LifetimeRow>) {
     val best = computeBarSegments(rows, 1, 3, 5)
 
     val bothInfinite = worst.isInfinite && best.isInfinite
-    val maxYears = when {
-        bothInfinite -> 1.0
-        worst.isInfinite -> best.totalYears.coerceAtLeast(1.0)
-        best.isInfinite -> worst.totalYears.coerceAtLeast(1.0)
-        else -> max(worst.totalYears, best.totalYears).coerceAtLeast(1.0)
-    }
+    val maxYears =
+        when {
+            bothInfinite -> 1.0
+            worst.isInfinite -> best.totalYears.coerceAtLeast(1.0)
+            best.isInfinite -> worst.totalYears.coerceAtLeast(1.0)
+            else -> max(worst.totalYears, best.totalYears).coerceAtLeast(1.0)
+        }
 
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
         // Year labels or infinity
@@ -290,7 +327,7 @@ private fun LifetimeCoverageBar(rows: List<LifetimeRow>) {
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(start = 40.dp)
+                modifier = Modifier.fillMaxWidth().padding(start = 40.dp),
             )
         } else {
             YearLabels(currentYear, maxYears)
@@ -306,13 +343,17 @@ private fun LifetimeCoverageBar(rows: List<LifetimeRow>) {
 }
 
 @Composable
-private fun YearLabels(currentYear: Int, maxYears: Double) {
+private fun YearLabels(
+    currentYear: Int,
+    maxYears: Double,
+) {
     val endYear = currentYear + ceil(maxYears).toInt()
     val span = endYear - currentYear
     val step = max(1, (span + 3) / 5) // ~5 labels
-    val years = (currentYear..endYear step step).toList().let {
-        if (it.last() != endYear && span > 1) it + endYear else it
-    }
+    val years =
+        (currentYear..endYear step step).toList().let {
+            if (it.last() != endYear && span > 1) it + endYear else it
+        }
 
     Row(modifier = Modifier.padding(start = 40.dp)) {
         years.forEachIndexed { i, year ->
@@ -321,14 +362,18 @@ private fun YearLabels(currentYear: Int, maxYears: Double) {
             Text(
                 text = yearLabel,
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
             )
         }
     }
 }
 
 @Composable
-private fun SegmentedBar(label: String, segments: BarSegments, maxYears: Double) {
+private fun SegmentedBar(
+    label: String,
+    segments: BarSegments,
+    maxYears: Double,
+) {
     val barHeight = 14.dp
     val shape = MaterialTheme.shapes.small
 
@@ -337,29 +382,32 @@ private fun SegmentedBar(label: String, segments: BarSegments, maxYears: Double)
             text = label,
             style = MaterialTheme.typography.labelSmall,
             color = if (label == "worst") WorstOrange else BestBlue,
-            modifier = Modifier.width(40.dp)
+            modifier = Modifier.width(40.dp),
         )
         Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(barHeight)
-                .clip(shape)
-                .background(if (segments.isInfinite) HighColor else UncoveredDark)
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .height(barHeight)
+                    .clip(shape)
+                    .background(if (segments.isInfinite) HighColor else UncoveredDark),
         ) {
             if (!segments.isInfinite) {
                 Row(modifier = Modifier.matchParentSize()) {
-                    val parts = listOf(
-                        segments.highYears to HighColor,
-                        segments.medYears to MediumColor,
-                        segments.lowYears to LowColor
-                    )
+                    val parts =
+                        listOf(
+                            segments.highYears to HighColor,
+                            segments.medYears to MediumColor,
+                            segments.lowYears to LowColor,
+                        )
                     parts.forEach { (years, color) ->
                         if (years > 0.001) {
                             Box(
-                                modifier = Modifier
-                                    .weight((years / maxYears).toFloat())
-                                    .fillMaxHeight()
-                                    .background(color)
+                                modifier =
+                                    Modifier
+                                        .weight((years / maxYears).toFloat())
+                                        .fillMaxHeight()
+                                        .background(color),
                             )
                         }
                     }
@@ -372,4 +420,3 @@ private fun SegmentedBar(label: String, segments: BarSegments, maxYears: Double)
         }
     }
 }
-

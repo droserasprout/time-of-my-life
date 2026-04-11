@@ -17,7 +17,7 @@ fun SettingsScreen(
     repository: FinanceRepository,
     innerPadding: PaddingValues,
     onShowWelcome: () -> Unit,
-    onShowHelp: () -> Unit
+    onShowHelp: () -> Unit,
 ) {
     var showImportExport by remember { mutableStateOf(false) }
 
@@ -34,26 +34,27 @@ private fun SettingsContent(
     innerPadding: PaddingValues,
     onShowWelcome: () -> Unit,
     onShowHelp: () -> Unit,
-    onShowImportExport: () -> Unit
+    onShowImportExport: () -> Unit,
 ) {
     val demoMode = LocalDemoMode.current
     val setDemoMode = LocalSetDemoMode.current
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(
-                top = innerPadding.calculateTopPadding() + 16.dp,
-                bottom = innerPadding.calculateBottomPadding(),
-                start = 16.dp,
-                end = 16.dp
-            )
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(
+                    top = innerPadding.calculateTopPadding() + 16.dp,
+                    bottom = innerPadding.calculateBottomPadding(),
+                    start = 16.dp,
+                    end = 16.dp,
+                ),
     ) {
         Text("Display", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
         Row(
             modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column {
                 Text("Demo mode", style = MaterialTheme.typography.bodyLarge)
@@ -76,12 +77,17 @@ private fun SettingsContent(
 }
 
 @Composable
-private fun SettingsItem(title: String, subtitle: String, onClick: () -> Unit) {
+private fun SettingsItem(
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit,
+) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 12.dp)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(vertical = 12.dp),
     ) {
         Text(title, style = MaterialTheme.typography.bodyLarge)
         Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

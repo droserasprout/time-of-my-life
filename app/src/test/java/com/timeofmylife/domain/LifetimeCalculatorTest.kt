@@ -1,21 +1,25 @@
 package com.timeofmylife.domain
 
-import com.timeofmylife.data.model.*
+import com.timeofmylife.data.model.Balance
+import com.timeofmylife.data.model.BudgetItem
+import com.timeofmylife.data.model.ItemType
+import com.timeofmylife.data.model.Reliability
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class LifetimeCalculatorTest {
-
-    private val balances = listOf(
-        Balance(name = "Bank", reliability = Reliability.HIGH, amount = 200.0),
-        Balance(name = "Broker", reliability = Reliability.MEDIUM, amount = 500.0),
-        Balance(name = "Crypto", reliability = Reliability.LOW, amount = 1000.0),
-    )
-    private val budgetItems = listOf(
-        BudgetItem(name = "Food", type = ItemType.EXPENSE, bestAmount = 100.0, worstAmount = 250.0),
-        BudgetItem(name = "Rent", type = ItemType.EXPENSE, bestAmount = 200.0, worstAmount = 300.0),
-        BudgetItem(name = "Salary", type = ItemType.INCOME, bestAmount = 600.0, worstAmount = 375.0),
-    )
+    private val balances =
+        listOf(
+            Balance(name = "Bank", reliability = Reliability.HIGH, amount = 200.0),
+            Balance(name = "Broker", reliability = Reliability.MEDIUM, amount = 500.0),
+            Balance(name = "Crypto", reliability = Reliability.LOW, amount = 1000.0),
+        )
+    private val budgetItems =
+        listOf(
+            BudgetItem(name = "Food", type = ItemType.EXPENSE, bestAmount = 100.0, worstAmount = 250.0),
+            BudgetItem(name = "Rent", type = ItemType.EXPENSE, bestAmount = 200.0, worstAmount = 300.0),
+            BudgetItem(name = "Salary", type = ItemType.INCOME, bestAmount = 600.0, worstAmount = 375.0),
+        )
 
     @Test
     fun `returns exactly 6 rows`() {
