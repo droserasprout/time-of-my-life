@@ -23,6 +23,7 @@
 | WorstOrange | #D9882A | Worst-case amounts, "worst" labels |
 | LastGrey | #9E9E9E | Last-month amounts, column headers |
 | NegativeText | #EF9A9A | Negative balance values |
+| SubduedText | #99E0E0E0 | Subdued headers, secondary labels (onSurface 60%) |
 | Purple | #7C4DFF | Retained for reference, not used as primary |
 
 ### Reliability
@@ -67,7 +68,7 @@ All styles from `MaterialTheme.typography` (Material 3 defaults):
 | Token | Radius | Usage |
 |-------|--------|-------|
 | small | 4dp | Bars, small elements |
-| medium | 8dp | Item cards |
+| medium | 8dp | Item cards, FABs, nav indicator, buttons, table cards |
 | large | 12dp | Dialogs, large containers |
 
 ## Shared Components
@@ -89,20 +90,43 @@ All styles from `MaterialTheme.typography` (Material 3 defaults):
 - Unselected: onSurfaceVariant
 - Separator "|": outline color, horizontal padding 8dp
 - Item padding: 4dp (symmetric)
+- No sort direction indicators — tap toggles asc/desc silently
+
+### AppDialog (shared shell)
+
+- `Dialog` → `Card(shape = RoundedCornerShape(DialogCornerRadius))` → `Column(padding = 24dp, spacedBy = 12dp)`
+- Used by AddEditBalanceDialog and AddEditBudgetItemDialog
+- QuickEditDialog uses custom padding (16dp/12dp), not AppDialog
+
+### AddFab (shared)
+
+- SmallFloatingActionButton, shapes.medium
+- Position: BottomEnd, end=16dp, bottom=innerPadding+16dp
+- Used on Balances and Budget screens
+
+### SectionHeader (shared)
+
+- Text: `labelMedium`, colored, padding vertical 4dp
+- Used on Balances (reliability tiers) and Budget (Expenses/Income)
+
+### AppToggle (custom switch)
+
+- Track: 44x24dp pill, RoundedCornerShape(trackHeight/2)
+- Thumb: 18dp circle, animates position
+- On: primary track + onPrimary thumb; Off: primaryContainer track + SubduedText thumb
 
 ### QuickEditDialog
 
 - Card shape: RoundedCornerShape(12dp)
 - Column padding: horizontal 16dp, vertical 12dp
-- TextField: fillMaxWidth, decimal keyboard, auto-focus, single-line
-- Spacer: 8dp between field and buttons
+- TextField: fillMaxWidth, minHeight 48dp, decimal keyboard, auto-focus, single-line
+- Title label with em dash separator (e.g. "Food — best")
 - Buttons: Edit (left) | Cancel + Save (right)
 
-### Full Edit Dialogs (Balance / BudgetItem)
+### Full Edit Dialogs (via AppDialog)
 
-- Card shape: RoundedCornerShape(12dp)
-- Column padding: 24dp, spacedBy 12dp
 - Title: `titleLarge`
+- TextField: fillMaxWidth, minHeight 48dp
 - Field labels: `labelMedium`
 - Chip row spacing: 8dp
 - Buttons: Delete/error (left, edit mode only) | Cancel + Save (right)
@@ -115,12 +139,6 @@ All styles from `MaterialTheme.typography` (Material 3 defaults):
 - Padding: start 16dp, end 12dp, top 7dp, bottom 7dp
 - Name text: `bodyLarge`
 
-### Section Headers (in item lists)
-
-- Text: `labelMedium`
-- Color: category color (reliability or expense/income)
-- Padding: vertical 4dp
-
 ## Screen Layouts
 
 ### Balances
@@ -132,7 +150,7 @@ Box(fillMaxSize)
       Column (padding: h=12, v=10)
         Proportion bar: height=14, shapes.small, weighted segments
         Spacer(8)
-        Header row: "sum" (72dp) + "%" (52dp), labelSmall, LastGrey
+        Header row: "sum" (72dp) + "%" (52dp), labelSmall, SubduedText
         Per-tier rows (HIGH/MEDIUM/LOW): bodyMedium label + bodySmall amounts
     SegmentedSelector (a-z | amount)
     LazyColumn (padding: top=8, bottom=innerPadding+80, start/end=16, spacedBy=8)
@@ -164,23 +182,25 @@ Box(fillMaxSize)
 ```text
 Column(fillMaxSize, padding: top/bottom=innerPadding)
   LifetimeCoverageBar (padding: h=16, v=8)
-    YearLabels or "infinity": labelSmall, alpha=0.4, start=40dp offset
-    Spacer(2)
     SegmentedBar (worst): label 40dp + bar height=14, shapes.small
     Spacer(4)
     SegmentedBar (best)
-    Spacer(6)
+    Spacer(2)
+    YearLabels or "infinity": labelSmall, alpha=0.4, start=40dp offset
   SegmentedSelector (all | expense | income)
-  Column(weight=1, verticalScroll)
-    Balance table (horizontalScroll, padding: 16)
-      HeaderCell: Scenario 120dp + amounts 70dp each, labelMedium, alpha=0.6
-      BalanceRow: bodySmall, NegativeText if negative, scenario dots 8dp
-      Dividers: outline, alpha=0.2
+  Column(weight=1, padding: bottom=16)
+    Surface(shapes.medium, 1dp elevation, weight=1, padding: h=16)
+      Balance table (padding: 8)
+        HeaderCell: Scenario weight=1.5 + amounts weight=1 each, SubduedText
+        BalanceRow: bodySmall, NegativeText if negative
+        Scenario dots: 10dp rounded squares (shapes.small), 2.5x alpha
+        Dividers: outline alpha=0.2, no trailing divider
     Spacer(16)
-    Survival table (fillMaxWidth, padding: h=16)
-      SurvivalHeaderCell: weight=1f each, labelMedium, alpha=0.6
-      SurvivalRow: bodySmall, scenario dots 8dp CircleShape
-      Dividers: outline, alpha=0.2
+    Surface(shapes.medium, 1dp elevation, weight=1, padding: h=16)
+      Survival table (padding: 8)
+        SurvivalHeaderCell: weight=1f each, SubduedText
+        SurvivalRow: bodySmall, scenario dots same as above
+        Dividers: outline alpha=0.2, no trailing divider
 ```
 
 ### Settings
@@ -282,8 +302,8 @@ Column headers use lowercase; everything else uses sentence case.
 | Item card elevation | 1dp tonal (via ItemCard) |
 | Item card padding | start=16, end=12, top=7, bottom=7 (via ItemCard) |
 | Section headers | labelMedium, primary color (all screens) |
-| Subdued column headers | onSurface alpha=0.6 |
-| Dialog content padding | 24dp (full edit), 16x12dp (quick edit) |
-| FAB | SmallFloatingActionButton, shapes.medium, BottomEnd, end=16, bottom=innerPadding+16 |
+| Subdued column headers | SubduedText (#99E0E0E0) |
+| Dialog content padding | 24dp via AppDialog (full edit), 16x12dp (quick edit) |
+| FAB | via AddFab: SmallFloatingActionButton, shapes.medium |
 | Totals panel padding | horizontal=12, vertical=10 |
 | Overlay screen padding | h=24-32dp (wider for readability) |
