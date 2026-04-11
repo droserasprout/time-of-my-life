@@ -65,7 +65,7 @@ fun <T> SegmentedSelector(
                             Modifier
                         },
                     )
-                    .padding(vertical = 4.dp, horizontal = 2.dp)
+                    .padding(4.dp)
             val text = label(option)
             if (showSuffix != null) {
                 val visible = showSuffix(option)
