@@ -5,18 +5,38 @@ export JAVA_HOME
 export ANDROID_HOME
 
 .PHONY: $(MAKECMDGOALS)
+MAKEFLAGS += --no-print-directory
+##
+##  ⏳ Time of My Life
+##
 
-build:
+help:           ## Show this help (default)
+	@grep -Fh "##" $(MAKEFILE_LIST) | grep -Fv grep -F | sed -e 's/\\$$//' | sed -e 's/##//'
+
+##
+##-- Build
+##
+
+build:          ## Build debug APK
 	./gradlew assembleDebug
 
-install:
+install:        ## Install debug APK on device
 	./gradlew installDebug
 
-test:
+clean:          ## Clean build artifacts
+	./gradlew clean
+
+##
+##-- CI
+##
+
+all:            ## Run an entire CI pipeline
+	make test lint-docs
+
+test:           ## Run tests
 	./gradlew test
 
-lint-docs:
+lint-docs:      ## Lint documentation
 	markdownlint docs/
 
-clean:
-	./gradlew clean
+##
