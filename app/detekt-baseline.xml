@@ -38,11 +38,12 @@
     <ID>FunctionNaming:QuickEditBalanceDialog.kt$@Composable fun QuickEditBalanceDialog( balance: Balance, onSave: (Balance) -&gt; Unit, onFullEdit: () -&gt; Unit, onDismiss: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:QuickEditBudgetItemDialog.kt$@Composable fun QuickEditBudgetItemDialog( item: BudgetItem, onSave: (BudgetItem) -&gt; Unit, onFullEdit: () -&gt; Unit, onDismiss: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:QuickEditDialog.kt$@Composable fun QuickEditDialog( title: String, initialValue: String, onSave: (Double) -&gt; Unit, onFullEdit: () -&gt; Unit, onDismiss: () -&gt; Unit, )</ID>
-    <ID>FunctionNaming:SegmentedSelector.kt$@Composable fun &lt;T&gt; SegmentedSelector( options: List&lt;T&gt;, selected: T, onSelect: (T) -&gt; Unit, label: (T) -&gt; String, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:SegmentedSelector.kt$@Composable fun &lt;T&gt; SegmentedSelector( options: List&lt;T&gt;, selected: T, onSelect: (T) -&gt; Unit, label: (T) -&gt; String, modifier: Modifier = Modifier, showSuffix: ((T) -&gt; Boolean)? = null, )</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@Composable fun SettingsScreen( repository: FinanceRepository, innerPadding: PaddingValues, onShowWelcome: () -&gt; Unit, onShowHelp: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun SettingsContent( innerPadding: PaddingValues, onShowWelcome: () -&gt; Unit, onShowHelp: () -&gt; Unit, onShowImportExport: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun SettingsItem( title: String, subtitle: String, onClick: () -&gt; Unit, )</ID>
-    <ID>FunctionNaming:Theme.kt$@Composable fun TimeOfMyLifeTheme(content: @Composable () -&gt; Unit)</ID>
+    <ID>FunctionNaming:SlidingNavBar.kt$@Composable fun SlidingNavBar( screens: List&lt;Screen&gt;, pagerState: PagerState, onNavigate: (Int) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>FunctionNaming:Theme.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun TimeOfMyLifeTheme(content: @Composable () -&gt; Unit)</ID>
     <ID>FunctionNaming:WelcomeScreen.kt$@Composable fun WelcomeScreen( onGetStarted: () -&gt; Unit, onShowHelp: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:WelcomeScreen.kt$@Composable private fun ConceptCard( icon: ImageVector, title: String, description: String, accentColor: androidx.compose.ui.graphics.Color, )</ID>
     <ID>LongMethod:AddEditBalanceDialog.kt$@Composable fun AddEditBalanceDialog( // null = adding new initial: Balance?, onConfirm: (Balance) -&gt; Unit, onDelete: (() -&gt; Unit)? = null, onDismiss: () -&gt; Unit, )</ID>
@@ -51,8 +52,11 @@
     <ID>LongMethod:BalancesScreen.kt$@Composable private fun TotalsPanel( tierSums: Map&lt;Reliability, Double&gt;, totalAmount: Double, modifier: Modifier = Modifier, )</ID>
     <ID>LongMethod:BudgetScreen.kt$@Composable fun BudgetScreen( repository: FinanceRepository, innerPadding: PaddingValues, )</ID>
     <ID>LongMethod:ImportExportScreen.kt$@Composable fun ImportExportScreen( repository: FinanceRepository, innerPadding: PaddingValues, )</ID>
+    <ID>LongMethod:SegmentedSelector.kt$@Composable fun &lt;T&gt; SegmentedSelector( options: List&lt;T&gt;, selected: T, onSelect: (T) -&gt; Unit, label: (T) -&gt; String, modifier: Modifier = Modifier, showSuffix: ((T) -&gt; Boolean)? = null, )</ID>
+    <ID>LongMethod:SlidingNavBar.kt$@Composable fun SlidingNavBar( screens: List&lt;Screen&gt;, pagerState: PagerState, onNavigate: (Int) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>LongMethod:WelcomeScreen.kt$@Composable fun WelcomeScreen( onGetStarted: () -&gt; Unit, onShowHelp: () -&gt; Unit, )</ID>
     <ID>LongParameterList:BudgetScreen.kt$( expenseBest: Double, expenseWorst: Double, expenseLast: Double, incomeBest: Double, incomeWorst: Double, incomeLast: Double, modifier: Modifier = Modifier, )</ID>
+    <ID>LongParameterList:SegmentedSelector.kt$( options: List&lt;T&gt;, selected: T, onSelect: (T) -&gt; Unit, label: (T) -&gt; String, modifier: Modifier = Modifier, showSuffix: ((T) -&gt; Boolean)? = null, )</ID>
     <ID>MagicNumber:AppNavigation.kt$3</ID>
     <ID>MagicNumber:BalancesScreen.kt$100.0</ID>
     <ID>MagicNumber:BalancesViewModel.kt$BalancesViewModel$5000</ID>
@@ -120,7 +124,6 @@
     <ID>WildcardImport:AddEditBudgetItemDialog.kt$import androidx.compose.material3.*</ID>
     <ID>WildcardImport:AddEditBudgetItemDialog.kt$import androidx.compose.runtime.*</ID>
     <ID>WildcardImport:AppDataExport.kt$import com.timeofmylife.data.model.*</ID>
-    <ID>WildcardImport:AppNavigation.kt$import androidx.compose.material3.*</ID>
     <ID>WildcardImport:AppNavigation.kt$import androidx.compose.runtime.*</ID>
     <ID>WildcardImport:BalanceDao.kt$import androidx.room.*</ID>
     <ID>WildcardImport:BalancesScreen.kt$import androidx.compose.foundation.layout.*</ID>
@@ -153,6 +156,8 @@
     <ID>WildcardImport:SettingsScreen.kt$import androidx.compose.foundation.layout.*</ID>
     <ID>WildcardImport:SettingsScreen.kt$import androidx.compose.material3.*</ID>
     <ID>WildcardImport:SettingsScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:SlidingNavBar.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:SlidingNavBar.kt$import androidx.compose.runtime.*</ID>
     <ID>WildcardImport:Theme.kt$import androidx.compose.material3.*</ID>
     <ID>WildcardImport:WelcomeScreen.kt$import androidx.compose.foundation.layout.*</ID>
     <ID>WildcardImport:WelcomeScreen.kt$import androidx.compose.material3.*</ID>

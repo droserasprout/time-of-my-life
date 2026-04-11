@@ -9,4 +9,5 @@ val CardBorderWidth = 4.dp
 val DialogCornerRadius = 16.dp
 val BarHeight = 14.dp
 val AmountColumnWidth = 64.dp
-val FabBottomClearance = 80.dp
+val NavBarHeight = 56.dp
+val FabBottomClearance = 64.dp

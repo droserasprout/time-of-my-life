@@ -10,7 +10,7 @@ import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Timeline
-import androidx.compose.material3.*
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -46,16 +46,11 @@ fun AppNavigation(
 
     Scaffold(
         bottomBar = {
-            NavigationBar {
-                screens.forEachIndexed { index, screen ->
-                    NavigationBarItem(
-                        icon = { Icon(screen.icon, contentDescription = screen.label) },
-                        label = { Text(screen.label) },
-                        selected = pagerState.currentPage == index,
-                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                    )
-                }
-            }
+            SlidingNavBar(
+                screens = screens,
+                pagerState = pagerState,
+                onNavigate = { scope.launch { pagerState.animateScrollToPage(it) } },
+            )
         },
     ) { innerPadding ->
         val pagePadding = PaddingValues(0.dp)
