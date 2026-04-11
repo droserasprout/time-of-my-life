@@ -2,6 +2,7 @@ package com.timeofmylife.ui.theme
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme =
@@ -16,10 +17,14 @@ private val DarkColorScheme =
         onSurface = Color(0xFFE0E0E0),
     )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimeOfMyLifeTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = DarkColorScheme,
-        content = content,
-    )
+    ) {
+        CompositionLocalProvider(LocalRippleConfiguration provides null) {
+            content()
+        }
+    }
 }
