@@ -77,18 +77,14 @@ fun BudgetScreen(
                 selected = sortOrder,
                 onSelect = { vm.setSortOrder(it) },
                 label = { order ->
-                    val arrow =
-                        if (order == sortOrder) {
-                            if (ascending) " \u25B2" else " \u25BC"
-                        } else {
-                            ""
-                        }
+                    val arrow = if (ascending) " \u25B2" else " \u25BC"
                     when (order) {
                         SortOrder.ALPHA -> "a-z$arrow"
                         SortOrder.AVG -> "avg$arrow"
                         SortOrder.LAST -> "last$arrow"
                     }
                 },
+                showSuffix = { it == sortOrder },
             )
 
             LazyColumn(
