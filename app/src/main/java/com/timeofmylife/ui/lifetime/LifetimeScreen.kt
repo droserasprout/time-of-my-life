@@ -166,7 +166,7 @@ private fun ScenarioLabel(
                 Modifier
                     .size(8.dp)
                     .clip(CircleShape)
-                    .background(dotColor),
+                    .background(dotColor.copy(alpha = (dotColor.alpha * 2.5f).coerceAtMost(1f))),
         )
         Spacer(modifier = Modifier.width(6.dp))
         Text(
@@ -320,6 +320,11 @@ private fun LifetimeCoverageBar(rows: List<LifetimeRow>) {
         }
 
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        SegmentedBar("worst", worst, maxYears)
+        Spacer(modifier = Modifier.height(4.dp))
+        SegmentedBar("best", best, maxYears)
+
+        Spacer(modifier = Modifier.height(2.dp))
         // Year labels or infinity
         if (bothInfinite) {
             Text(
@@ -332,13 +337,6 @@ private fun LifetimeCoverageBar(rows: List<LifetimeRow>) {
         } else {
             YearLabels(currentYear, maxYears)
         }
-        Spacer(modifier = Modifier.height(2.dp))
-
-        SegmentedBar("worst", worst, maxYears)
-        Spacer(modifier = Modifier.height(4.dp))
-        SegmentedBar("best", best, maxYears)
-
-        Spacer(modifier = Modifier.height(6.dp))
     }
 }
 
