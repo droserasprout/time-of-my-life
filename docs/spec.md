@@ -95,6 +95,19 @@ with header rows matching entity field names.
 - **Import:** reads file, replaces all current data (with confirmation dialog)
 - IDs are not serialized; they are regenerated on import
 
+## Build & CI
+
+| Tool | Purpose |
+|---|---|
+| AGP 8.7.x | Android Gradle Plugin |
+| Kotlin 2.0.x | Language |
+| ktlint | Kotlin code formatting (via Gradle plugin) |
+| detekt | Kotlin static analysis (with baseline for existing code) |
+| markdownlint | Markdown linting |
+
+`make all` runs the full CI pipeline (`lint` + `test`).
+`make format` auto-formats Kotlin sources.
+
 ## Out of Scope (v1)
 
 - Multi-currency support
