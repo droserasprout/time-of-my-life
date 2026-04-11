@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -13,7 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
@@ -81,6 +82,7 @@ fun LifetimeScreen(
                     .weight(1f)
                     .verticalScroll(rememberScrollState()),
         ) {
+            // Monthly table
             Surface(
                 shape = MaterialTheme.shapes.medium,
                 tonalElevation = 1.dp,
@@ -92,9 +94,8 @@ fun LifetimeScreen(
                             HeaderCell(col, weight = if (i == 0) 1.5f else 1f, isLabel = i == 0)
                         }
                     }
-                    HorizontalDivider()
                     rows.forEachIndexed { index, row ->
-                        BalanceRow(row, LifetimeRowColors.getOrElse(index) { Color.Transparent })
+                        BalanceRow(row)
                         if (index < rows.lastIndex) {
                             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                         }
@@ -117,7 +118,7 @@ fun LifetimeScreen(
                         SurvivalHeaderCell(SURVIVAL_COLUMNS[2])
                     }
                     rows.forEachIndexed { index, row ->
-                        SurvivalRow(row, LifetimeRowColors.getOrElse(index) { Color.Transparent })
+                        SurvivalRow(row)
                         if (index < rows.lastIndex) {
                             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
                         }
@@ -164,10 +165,7 @@ private fun RowScope.HeaderCell(
 }
 
 @Composable
-private fun ScenarioLabel(
-    label: String,
-    dotColor: Color,
-) {
+private fun ScenarioLabel(label: String) {
     val parts = label.split(" / ")
     val reliabilityPart = parts.getOrElse(0) { "" }
     val budgetPart = parts.getOrElse(1) { "" }
@@ -175,38 +173,25 @@ private fun ScenarioLabel(
     val budgetColor = BUDGET_COLORS[budgetPart] ?: MaterialTheme.colorScheme.onSurface
     val separatorColor = LastGrey
 
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            modifier =
-                Modifier
-                    .size(10.dp)
-                    .clip(MaterialTheme.shapes.small)
-                    .background(dotColor.copy(alpha = (dotColor.alpha * 2.5f).coerceAtMost(1f))),
-        )
-        Spacer(modifier = Modifier.width(6.dp))
-        Text(
-            buildAnnotatedString {
-                withStyle(SpanStyle(color = reliabilityColor)) { append(reliabilityPart) }
-                withStyle(SpanStyle(color = separatorColor)) { append(" / ") }
-                withStyle(SpanStyle(color = budgetColor)) { append(budgetPart) }
-            },
-            style = MaterialTheme.typography.bodySmall,
-        )
-    }
+    Text(
+        buildAnnotatedString {
+            withStyle(SpanStyle(color = reliabilityColor)) { append(reliabilityPart) }
+            withStyle(SpanStyle(color = separatorColor)) { append(" / ") }
+            withStyle(SpanStyle(color = budgetColor)) { append(budgetPart) }
+        },
+        style = MaterialTheme.typography.bodySmall,
+    )
 }
 
 @Composable
-private fun BalanceRow(
-    row: LifetimeRow,
-    dotColor: Color,
-) {
+private fun BalanceRow(row: LifetimeRow) {
     val demo = LocalDemoMode.current
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(modifier = Modifier.weight(1.5f).padding(vertical = 8.dp, horizontal = 4.dp)) {
-            ScenarioLabel(row.label, dotColor)
+            ScenarioLabel(row.label)
         }
         BalanceCell(formatAmount(row.balance1m, demo))
         BalanceCell(formatAmount(row.balance3m, demo))
@@ -216,10 +201,7 @@ private fun BalanceRow(
 }
 
 @Composable
-private fun SurvivalRow(
-    row: LifetimeRow,
-    dotColor: Color,
-) {
+private fun SurvivalRow(row: LifetimeRow) {
     val months = row.monthsLeft
     val totalDays = if (months.isInfinite()) Long.MAX_VALUE else (months * 30.44).toLong()
     val timeLeft =
@@ -244,7 +226,7 @@ private fun SurvivalRow(
         Box(
             modifier = Modifier.weight(1f).padding(vertical = 8.dp, horizontal = 4.dp),
         ) {
-            ScenarioLabel(row.label, dotColor)
+            ScenarioLabel(row.label)
         }
         SurvivalCell(timeLeft)
         SurvivalCell(finalDay)
