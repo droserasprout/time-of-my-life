@@ -1,48 +1,47 @@
 # Time of My Life
 
-Android app that answers one question: **how long can you live on your current savings?**
+Optinionated budget planner for Android. Answers one question: **how long can you live on your current savings?**
 
-Enter your balances and monthly budget, and the app computes how many months (and the exact final date) your money lasts across six scenarios — from your most reliable assets with an optimistic budget to everything you own in the worst case.
+Enter your balances and monthly budget, and the app computes how many months your money lasts across six scenarios — from your most reliable assets in the worst case (danger zone, need more cash!) to everything you own with optimistic budget (dream scenario, very unlikely).
 
-Swipe between all four screens or use the bottom navigation bar.
+All data is stored locally. No network access, no accounts. Make backups!
 
-## Screens
+<table>
+  <tr>
+    <td><img src="screen2.png" width="250"/></td>
+    <td><img src="screen3.png" width="250"/></td>
+    <td><img src="screen4.png" width="250"/></td>
+  </tr>
+</table>
 
-### Balances
+## How it works
 
-Your assets, grouped by reliability: **High** (e.g. bank account), **Medium** (e.g. brokerage), **Low** (e.g. crypto). Tap to quick-edit the amount; use the edit icon for full details. Swipe left to delete.
+**Balances** screen is your assets, grouped by reliability:
 
-### Budget
+- **High** - cash, bank accounts, available at any time.
+- **Medium** - brokerage and other "cold" accounts, not instantly available but can be liquidated in a few days/weeks.
+- **Low** - crypto, debts
 
-Monthly expenses and incomes. Each item has three amounts: **best** (optimistic), **last** (last month actual), and **worst** (pessimistic). Totals and net are pinned at the top with a tick bar showing where last month landed. Sort A–Z or by size. Tap to edit; delete from the edit dialog.
+**Budget** screen is your expences ans incomes in three scenarios:
 
-### Life Time
+- **Best** - optimistic scenario
+- **Last** - actual amount spent/gain during last month
+- **Worst** - pessimistic scenario
 
-Two tables:
+**Life Time** screen is two tables:
 
-**Balance matrix** — how much money remains after 1, 3, 6, and 12 months across six scenarios (high/medium/low reliability × best/worst budget).
+- **Monthly** — how much money you are going to have after 1/3/6/12 months across six scenarios.
+- **Survival** — for each scenario: time left and the projected day when u r broke.
 
-**Survival table** — for each scenario: time left formatted as `Xm Yd` and the projected final day as `YYYY-MM-DD`.
-
-Scenarios where income ≥ expenses show `∞`.
-
-### Settings
-
-Export and import all data as JSON (single file) or CSV (separate files per table to a folder).
-
-## Data
-
-All data is stored locally in a SQLite database (Room). No network access, no accounts.
+That's all! Works for me, might work for you too.
 
 ## Build
 
 ```bash
 # Debug APK
 make build
-
 # Install on connected device
 make install
-
 # Unit tests
 make test
 ```
