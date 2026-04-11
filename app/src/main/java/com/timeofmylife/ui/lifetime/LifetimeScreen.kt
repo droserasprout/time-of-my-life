@@ -95,7 +95,9 @@ fun LifetimeScreen(
                     HorizontalDivider()
                     rows.forEachIndexed { index, row ->
                         BalanceRow(row, LifetimeRowColors.getOrElse(index) { Color.Transparent })
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                        if (index < rows.lastIndex) {
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                        }
                     }
                 }
             }
@@ -116,7 +118,9 @@ fun LifetimeScreen(
                     }
                     rows.forEachIndexed { index, row ->
                         SurvivalRow(row, LifetimeRowColors.getOrElse(index) { Color.Transparent })
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                        if (index < rows.lastIndex) {
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                        }
                     }
                 }
             }
