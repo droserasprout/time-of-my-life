@@ -4,13 +4,13 @@ import androidx.compose.ui.graphics.Color
 
 val Purple = Color(0xFF7C4DFF)
 val Accent = Color(0xFF9E9E9E)
-val AccentContainer = Color(0xFF424242)
+val AccentContainer = Color(0xFF505050)
 val OnAccent = Color(0xFFFFFFFF)
 
-val ExpenseRed = Color(0xFFEF5350)
-val IncomeGreen = Color(0xFF66BB6A)
-val BestBlue = Color(0xFF42A5F5)
-val WorstOrange = Color(0xFFFF9800)
+val ExpenseRed = Color(0xFFD4635F)
+val IncomeGreen = Color(0xFF5BA85E)
+val BestBlue = Color(0xFF3D8FD4)
+val WorstOrange = Color(0xFFD9882A)
 val LastGrey = Color(0xFF9E9E9E)
 val NegativeText = Color(0xFFEF9A9A)
 

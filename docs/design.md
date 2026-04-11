@@ -7,20 +7,20 @@
 | Token | Hex | Usage |
 |-------|-----|-------|
 | Primary (Accent) | #9E9E9E | Section titles, selected states, underlines |
-| PrimaryContainer | #424242 | Container backgrounds |
+| PrimaryContainer | #505050 | Container backgrounds, nav indicator |
 | OnPrimary | #FFFFFF | Text on primary |
 | Background | #121212 | Screen background |
-| Surface | #1E1E1E | Cards, elevated surfaces |
+| Surface | #181818 | Cards, elevated surfaces |
 | OnSurface | #E0E0E0 | Primary text |
 
 ### Semantic
 
 | Name | Hex | Usage |
 |------|-----|-------|
-| ExpenseRed | #EF5350 | Expense items, borders |
-| IncomeGreen | #66BB6A | Income items, borders |
-| BestBlue | #42A5F5 | Best-case amounts, "best" labels |
-| WorstOrange | #FF9800 | Worst-case amounts, "worst" labels |
+| ExpenseRed | #D4635F | Expense items, borders |
+| IncomeGreen | #5BA85E | Income items, borders |
+| BestBlue | #3D8FD4 | Best-case amounts, "best" labels |
+| WorstOrange | #D9882A | Worst-case amounts, "worst" labels |
 | LastGrey | #9E9E9E | Last-month amounts, column headers |
 | NegativeText | #EF9A9A | Negative balance values |
 | Purple | #7C4DFF | Retained for reference, not used as primary |
@@ -62,7 +62,24 @@ All styles from `MaterialTheme.typography` (Material 3 defaults):
 | labelMedium | SegmentedSelector options, table headers, list section headers |
 | labelSmall | Totals column headers, year labels, bar labels |
 
+## Shapes
+
+| Token | Radius | Usage |
+|-------|--------|-------|
+| small | 4dp | Bars, small elements |
+| medium | 8dp | Item cards |
+| large | 12dp | Dialogs, large containers |
+
 ## Shared Components
+
+### SlidingNavBar
+
+- Custom bottom bar replacing Material3 NavigationBar
+- Height: 56dp, Surface color with 3dp tonal elevation
+- Sliding indicator: AccentContainer rounded rect, DialogCornerRadius corners
+- Tracks HorizontalPager offset for smooth sliding during swipes
+- Icons: 22dp, labels: labelSmall
+- Selected: Accent color, unselected: onSurface alpha=0.5
 
 ### SegmentedSelector
 
@@ -75,7 +92,7 @@ All styles from `MaterialTheme.typography` (Material 3 defaults):
 
 ### QuickEditDialog
 
-- Card shape: RoundedCornerShape(16dp)
+- Card shape: RoundedCornerShape(12dp)
 - Column padding: horizontal 16dp, vertical 12dp
 - TextField: fillMaxWidth, decimal keyboard, auto-focus, single-line
 - Spacer: 8dp between field and buttons
@@ -83,7 +100,7 @@ All styles from `MaterialTheme.typography` (Material 3 defaults):
 
 ### Full Edit Dialogs (Balance / BudgetItem)
 
-- Card shape: RoundedCornerShape(16dp)
+- Card shape: RoundedCornerShape(12dp)
 - Column padding: 24dp, spacedBy 12dp
 - Title: `titleLarge`
 - Field labels: `labelMedium`
@@ -113,10 +130,10 @@ Box(fillMaxSize)
   Column(fillMaxSize)
     TotalsPanel (padding: top=innerPadding+4, start/end=16)
       Column (padding: h=12, v=10)
+        Proportion bar: height=14, shapes.small, weighted segments
+        Spacer(8)
         Header row: "sum" (72dp) + "%" (52dp), labelSmall, LastGrey
         Per-tier rows (HIGH/MEDIUM/LOW): bodyMedium label + bodySmall amounts
-        Spacer(8)
-        Proportion bar: height=14, shapes.small, weighted segments
     SegmentedSelector (a-z | amount)
     LazyColumn (padding: top=8, bottom=innerPadding+80, start/end=16, spacedBy=8)
       SectionHeader per reliability tier
@@ -131,10 +148,10 @@ Box(fillMaxSize)
   Column(fillMaxSize)
     TotalsCard (padding: top=innerPadding+4, start/end=16)
       Column (padding: h=12, v=10)
+        TickBar: height=14+4 overhang, fullWidth, blue/orange bg, white rounded tick
+        Spacer(8)
         Header row: "best"/"last"/"worst" (64dp each), labelSmall
         TotalsRow x3: Expenses/Income/Net, bodyMedium + bodySmall
-        TickBar: height=8, width=64*3, LastGrey line + tick
-        Spacer(8)
     SegmentedSelector (a-z | avg | last)
     LazyColumn (padding: top=8, bottom=innerPadding+80, start/end=16, spacedBy=8)
       SectionHeader: "Expenses" / "Income"
@@ -171,7 +188,7 @@ Column(fillMaxSize, padding: top/bottom=innerPadding)
 ```text
 Column(fillMaxSize, padding: top=innerPadding+16, bottom=innerPadding, start/end=16)
   Section "Display" (labelMedium, primary)
-    Demo mode row: bodyLarge + bodySmall, Switch
+    Demo mode row: bodyLarge + bodySmall, custom AppToggle (44x24dp pill, 18dp thumb)
   Spacer(16)
   Section "Data" (labelMedium, primary)
     SettingsItem: "Import / Export" -> nested ImportExportScreen
@@ -252,10 +269,11 @@ Column headers use lowercase; everything else uses sentence case.
 | SectionSpacing | 16dp | Between settings/totals sections |
 | ItemSpacing | 8dp | LazyColumn spacedBy, spacers |
 | CardBorderWidth | 4dp | ItemCard left border |
-| DialogCornerRadius | 16dp | All dialog cards |
+| DialogCornerRadius | 12dp | All dialog cards |
 | BarHeight | 14dp | Proportion and coverage bars |
 | AmountColumnWidth | 64dp | Amount columns across all screens |
-| FabBottomClearance | 80dp | LazyColumn bottom padding for FAB |
+| NavBarHeight | 56dp | Custom sliding navigation bar |
+| FabBottomClearance | 64dp | LazyColumn bottom padding for FAB |
 
 ## Common Patterns
 

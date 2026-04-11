@@ -14,7 +14,7 @@ private val DarkColorScheme =
         primaryContainer = AccentContainer,
         onPrimaryContainer = OnAccent,
         background = Color(0xFF121212),
-        surface = Color(0xFF1E1E1E),
+        surface = Color(0xFF181818),
         onBackground = Color(0xFFE0E0E0),
         onSurface = Color(0xFFE0E0E0),
     )

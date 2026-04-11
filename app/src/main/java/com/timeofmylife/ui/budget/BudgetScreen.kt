@@ -306,7 +306,7 @@ private fun TickBar(
 ) {
     val range = worst - best
     val fraction = if (range != 0.0) ((last - best) / range).toFloat().coerceIn(0f, 1f) else 0.5f
-    val tickColor = LastGrey
+    val tickColor = Color.White
     val tickOverhang = 2.dp
     val tickWidth = 8.dp
     val tickRadius = 2.dp

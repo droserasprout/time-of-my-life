@@ -1,10 +1,8 @@
-# Project
+# Knowledge
 
-See [docs/spec.md](docs/spec.md) for product specification
-and [docs/design.md](docs/design.md) for design system.
+Keep these files in memory and keep them up to date with every codebase change:
 
-## Linting
-
-- `make lint` runs ktlint, detekt, and markdownlint
-- `make format` auto-formats Kotlin sources with ktlint
-- detekt uses a baseline file (`app/detekt-baseline.xml`); new code must pass without adding to it
+- [docs/spec.md](docs/spec.md) - specification of the app's features and behavior
+- [docs/design.md](docs/design.md) - design system guidelines
+- [README.md](README.md) - user-facing documentation and build instructions
+- [Makefile](Makefile) - build and development commands
