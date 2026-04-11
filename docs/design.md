@@ -76,7 +76,7 @@ All styles from `MaterialTheme.typography` (Material 3 defaults):
 
 - Custom bottom bar replacing Material3 NavigationBar
 - Height: 56dp, Surface color with 3dp tonal elevation
-- Sliding indicator: AccentContainer rounded rect, DialogCornerRadius corners
+- Sliding indicator: AccentContainer rounded rect, 8dp corners (matches shapes.medium)
 - Tracks HorizontalPager offset for smooth sliding during swipes
 - Icons: 22dp, labels: labelSmall
 - Selected: Accent color, unselected: onSurface alpha=0.5
@@ -88,7 +88,7 @@ All styles from `MaterialTheme.typography` (Material 3 defaults):
 - Selected: primary color + 2dp underline (Accent)
 - Unselected: onSurfaceVariant
 - Separator "|": outline color, horizontal padding 8dp
-- Item padding: vertical 4dp, horizontal 2dp
+- Item padding: 4dp (symmetric)
 
 ### QuickEditDialog
 
@@ -112,7 +112,7 @@ All styles from `MaterialTheme.typography` (Material 3 defaults):
 - Surface shape: `MaterialTheme.shapes.medium`
 - tonalElevation: 1dp
 - Left border: 4dp wide, drawn via `drawBehind`
-- Padding: start 16dp, end 12dp, top 10dp, bottom 10dp
+- Padding: start 16dp, end 12dp, top 7dp, bottom 7dp
 - Name text: `bodyLarge`
 
 ### Section Headers (in item lists)
@@ -138,7 +138,7 @@ Box(fillMaxSize)
     LazyColumn (padding: top=8, bottom=innerPadding+80, start/end=16, spacedBy=8)
       SectionHeader per reliability tier
       BalanceItem cards
-  FAB (BottomEnd, padding: end=16, bottom=innerPadding+16)
+  SmallFAB (BottomEnd, shapes.medium, padding: end=16, bottom=innerPadding+16)
 ```
 
 ### Budget
@@ -156,7 +156,7 @@ Box(fillMaxSize)
     LazyColumn (padding: top=8, bottom=innerPadding+80, start/end=16, spacedBy=8)
       SectionHeader: "Expenses" / "Income"
       BudgetItemRow cards (3 amount columns, 64dp each)
-  FAB (BottomEnd, padding: end=16, bottom=innerPadding+16)
+  SmallFAB (BottomEnd, shapes.medium, padding: end=16, bottom=innerPadding+16)
 ```
 
 ### Life Time
@@ -273,17 +273,17 @@ Column headers use lowercase; everything else uses sentence case.
 | BarHeight | 14dp | Proportion and coverage bars |
 | AmountColumnWidth | 64dp | Amount columns across all screens |
 | NavBarHeight | 56dp | Custom sliding navigation bar |
-| FabBottomClearance | 64dp | LazyColumn bottom padding for FAB |
+| FabBottomClearance | 80dp | LazyColumn bottom padding for FAB |
 
 ## Common Patterns
 
 | Pattern | Value |
 |---------|-------|
 | Item card elevation | 1dp tonal (via ItemCard) |
-| Item card padding | start=16, end=12, top=10, bottom=10 (via ItemCard) |
+| Item card padding | start=16, end=12, top=7, bottom=7 (via ItemCard) |
 | Section headers | labelMedium, primary color (all screens) |
 | Subdued column headers | onSurface alpha=0.6 |
 | Dialog content padding | 24dp (full edit), 16x12dp (quick edit) |
-| FAB position | BottomEnd, end=16, bottom=innerPadding+16 |
+| FAB | SmallFloatingActionButton, shapes.medium, BottomEnd, end=16, bottom=innerPadding+16 |
 | Totals panel padding | horizontal=12, vertical=10 |
 | Overlay screen padding | h=24-32dp (wider for readability) |
