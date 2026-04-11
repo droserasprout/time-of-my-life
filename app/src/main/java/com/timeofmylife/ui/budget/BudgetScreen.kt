@@ -4,8 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,9 +20,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.data.model.BudgetItem
 import com.timeofmylife.data.model.ItemType
+import com.timeofmylife.ui.AddFab
 import com.timeofmylife.ui.ItemCard
 import com.timeofmylife.ui.LocalDemoMode
 import com.timeofmylife.ui.QuickEditDialog
+import com.timeofmylife.ui.SectionHeader
 import com.timeofmylife.ui.SegmentedSelector
 import com.timeofmylife.ui.formatAmount
 import com.timeofmylife.ui.theme.*
@@ -122,16 +122,11 @@ fun BudgetScreen(
             }
         }
 
-        SmallFloatingActionButton(
+        AddFab(
             onClick = { showAddDialog = true },
-            shape = MaterialTheme.shapes.medium,
-            modifier =
-                Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = ScreenHorizontalPadding, bottom = innerPadding.calculateBottomPadding() + ScreenHorizontalPadding),
-        ) {
-            Icon(Icons.Default.Add, contentDescription = "Add budget item")
-        }
+            contentDescription = "Add budget item",
+            bottomPadding = innerPadding.calculateBottomPadding(),
+        )
     }
 
     if (showAddDialog) {
@@ -194,19 +189,6 @@ fun BudgetScreen(
 }
 
 @Composable
-private fun SectionHeader(
-    label: String,
-    color: Color,
-) {
-    Text(
-        label,
-        style = MaterialTheme.typography.labelMedium,
-        color = color,
-        modifier = Modifier.padding(vertical = 4.dp),
-    )
-}
-
-@Composable
 private fun TotalsCard(
     expenseBest: Double,
     expenseWorst: Double,
@@ -231,7 +213,7 @@ private fun TotalsCard(
         // Header row
         Row(modifier = Modifier.fillMaxWidth()) {
             Spacer(modifier = Modifier.weight(1f))
-            val headerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            val headerColor = SubduedText
             Text(
                 "best",
                 style = MaterialTheme.typography.labelSmall,

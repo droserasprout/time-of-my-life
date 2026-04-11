@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.timeofmylife.data.FinanceRepository
 import com.timeofmylife.ui.LocalDemoMode
 import com.timeofmylife.ui.LocalSetDemoMode
+import com.timeofmylife.ui.theme.SubduedText
 
 @Composable
 fun SettingsScreen(
@@ -112,7 +113,7 @@ private fun AppToggle(
     val trackColor =
         if (checked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primaryContainer
     val thumbColor =
-        if (checked) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+        if (checked) MaterialTheme.colorScheme.onPrimary else SubduedText
 
     Box(
         modifier =

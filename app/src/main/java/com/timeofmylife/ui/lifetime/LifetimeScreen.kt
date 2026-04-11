@@ -122,7 +122,7 @@ private fun RowScope.SurvivalHeaderCell(
     Text(
         text = text,
         style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+        color = SubduedText,
         textAlign = if (isLabel) TextAlign.Start else TextAlign.End,
         modifier =
             Modifier
@@ -139,7 +139,7 @@ private fun HeaderCell(
     Text(
         text = text,
         style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+        color = SubduedText,
         textAlign = if (text == "Scenario") TextAlign.Start else TextAlign.End,
         modifier =
             Modifier

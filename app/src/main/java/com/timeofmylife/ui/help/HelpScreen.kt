@@ -65,6 +65,7 @@ fun HelpScreen(onBack: () -> Unit) {
             Button(
                 onClick = onBack,
                 modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
             ) {
                 Text("Back")
             }

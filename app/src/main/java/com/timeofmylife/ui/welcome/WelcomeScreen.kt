@@ -101,6 +101,7 @@ fun WelcomeScreen(
             OutlinedButton(
                 onClick = onShowHelp,
                 modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
             ) {
                 Text("Show help")
             }
@@ -111,6 +112,7 @@ fun WelcomeScreen(
                     onGetStarted()
                 },
                 modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
             ) {
                 Text("Get started")
             }

@@ -6,14 +6,14 @@
     <ID>CyclomaticComplexMethod:BudgetScreen.kt$@Composable fun BudgetScreen( repository: FinanceRepository, innerPadding: PaddingValues, )</ID>
     <ID>FunctionNaming:AddEditBalanceDialog.kt$@Composable fun AddEditBalanceDialog( // null = adding new initial: Balance?, onConfirm: (Balance) -&gt; Unit, onDelete: (() -&gt; Unit)? = null, onDismiss: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:AddEditBudgetItemDialog.kt$@Composable fun AddEditBudgetItemDialog( initial: BudgetItem?, onConfirm: (BudgetItem) -&gt; Unit, onDelete: (() -&gt; Unit)? = null, onDismiss: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:AddFab.kt$@Composable fun BoxScope.AddFab( onClick: () -&gt; Unit, contentDescription: String, bottomPadding: Dp, )</ID>
+    <ID>FunctionNaming:AppDialog.kt$@Composable fun AppDialog( onDismiss: () -&gt; Unit, content: @Composable ColumnScope.() -&gt; Unit, )</ID>
     <ID>FunctionNaming:AppNavigation.kt$@OptIn(ExperimentalFoundationApi::class) @Composable fun AppNavigation( repository: FinanceRepository, onShowWelcome: () -&gt; Unit, onShowHelp: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:BalancesScreen.kt$@Composable fun BalancesScreen( repository: FinanceRepository, innerPadding: PaddingValues, )</ID>
     <ID>FunctionNaming:BalancesScreen.kt$@Composable private fun BalanceItem( balance: Balance, onTap: () -&gt; Unit, )</ID>
-    <ID>FunctionNaming:BalancesScreen.kt$@Composable private fun SectionHeader( label: String, color: Color, )</ID>
     <ID>FunctionNaming:BalancesScreen.kt$@Composable private fun TotalsPanel( tierSums: Map&lt;Reliability, Double&gt;, totalAmount: Double, modifier: Modifier = Modifier, )</ID>
     <ID>FunctionNaming:BudgetScreen.kt$@Composable fun BudgetScreen( repository: FinanceRepository, innerPadding: PaddingValues, )</ID>
     <ID>FunctionNaming:BudgetScreen.kt$@Composable private fun BudgetItemRow( item: BudgetItem, onColumnClick: (BudgetColumn) -&gt; Unit, onNameClick: () -&gt; Unit, )</ID>
-    <ID>FunctionNaming:BudgetScreen.kt$@Composable private fun SectionHeader( label: String, color: Color, )</ID>
     <ID>FunctionNaming:BudgetScreen.kt$@Composable private fun TickBar( best: Double, worst: Double, last: Double, modifier: Modifier = Modifier, )</ID>
     <ID>FunctionNaming:BudgetScreen.kt$@Composable private fun TotalsCard( expenseBest: Double, expenseWorst: Double, expenseLast: Double, incomeBest: Double, incomeWorst: Double, incomeLast: Double, modifier: Modifier = Modifier, )</ID>
     <ID>FunctionNaming:BudgetScreen.kt$@Composable private fun TotalsRow( label: String, best: Double, worst: Double, last: Double, labelColor: Color, )</ID>
@@ -38,15 +38,16 @@
     <ID>FunctionNaming:QuickEditBalanceDialog.kt$@Composable fun QuickEditBalanceDialog( balance: Balance, onSave: (Balance) -&gt; Unit, onFullEdit: () -&gt; Unit, onDismiss: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:QuickEditBudgetItemDialog.kt$@Composable fun QuickEditBudgetItemDialog( item: BudgetItem, onSave: (BudgetItem) -&gt; Unit, onFullEdit: () -&gt; Unit, onDismiss: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:QuickEditDialog.kt$@Composable fun QuickEditDialog( title: String, initialValue: String, onSave: (Double) -&gt; Unit, onFullEdit: () -&gt; Unit, onDismiss: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:SectionHeader.kt$@Composable fun SectionHeader( label: String, color: Color, )</ID>
     <ID>FunctionNaming:SegmentedSelector.kt$@Composable fun &lt;T&gt; SegmentedSelector( options: List&lt;T&gt;, selected: T, onSelect: (T) -&gt; Unit, label: (T) -&gt; String, modifier: Modifier = Modifier, showSuffix: ((T) -&gt; Boolean)? = null, )</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@Composable fun SettingsScreen( repository: FinanceRepository, innerPadding: PaddingValues, onShowWelcome: () -&gt; Unit, onShowHelp: () -&gt; Unit, )</ID>
+    <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun AppToggle( checked: Boolean, onCheckedChange: (Boolean) -&gt; Unit, )</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun SettingsContent( innerPadding: PaddingValues, onShowWelcome: () -&gt; Unit, onShowHelp: () -&gt; Unit, onShowImportExport: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun SettingsItem( title: String, subtitle: String, onClick: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:SlidingNavBar.kt$@Composable fun SlidingNavBar( screens: List&lt;Screen&gt;, pagerState: PagerState, onNavigate: (Int) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>FunctionNaming:Theme.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun TimeOfMyLifeTheme(content: @Composable () -&gt; Unit)</ID>
     <ID>FunctionNaming:WelcomeScreen.kt$@Composable fun WelcomeScreen( onGetStarted: () -&gt; Unit, onShowHelp: () -&gt; Unit, )</ID>
     <ID>FunctionNaming:WelcomeScreen.kt$@Composable private fun ConceptCard( icon: ImageVector, title: String, description: String, accentColor: androidx.compose.ui.graphics.Color, )</ID>
-    <ID>LongMethod:AddEditBalanceDialog.kt$@Composable fun AddEditBalanceDialog( // null = adding new initial: Balance?, onConfirm: (Balance) -&gt; Unit, onDelete: (() -&gt; Unit)? = null, onDismiss: () -&gt; Unit, )</ID>
     <ID>LongMethod:AddEditBudgetItemDialog.kt$@Composable fun AddEditBudgetItemDialog( initial: BudgetItem?, onConfirm: (BudgetItem) -&gt; Unit, onDelete: (() -&gt; Unit)? = null, onDismiss: () -&gt; Unit, )</ID>
     <ID>LongMethod:BalancesScreen.kt$@Composable fun BalancesScreen( repository: FinanceRepository, innerPadding: PaddingValues, )</ID>
     <ID>LongMethod:BalancesScreen.kt$@Composable private fun TotalsPanel( tierSums: Map&lt;Reliability, Double&gt;, totalAmount: Double, modifier: Modifier = Modifier, )</ID>
@@ -61,7 +62,6 @@
     <ID>MagicNumber:BalancesScreen.kt$100.0</ID>
     <ID>MagicNumber:BalancesViewModel.kt$BalancesViewModel$5000</ID>
     <ID>MagicNumber:BudgetScreen.kt$0.5f</ID>
-    <ID>MagicNumber:BudgetScreen.kt$3</ID>
     <ID>MagicNumber:BudgetViewModel.kt$BudgetViewModel$5000</ID>
     <ID>MagicNumber:Color.kt$0x330064FF</ID>
     <ID>MagicNumber:Color.kt$0x3364C800</ID>
@@ -69,16 +69,17 @@
     <ID>MagicNumber:Color.kt$0x33FF6400</ID>
     <ID>MagicNumber:Color.kt$0x33FFC800</ID>
     <ID>MagicNumber:Color.kt$0x40FF0000</ID>
+    <ID>MagicNumber:Color.kt$0x99E0E0E0</ID>
     <ID>MagicNumber:Color.kt$0xFF2A2A2A</ID>
-    <ID>MagicNumber:Color.kt$0xFF424242</ID>
-    <ID>MagicNumber:Color.kt$0xFF42A5F5</ID>
-    <ID>MagicNumber:Color.kt$0xFF66BB6A</ID>
+    <ID>MagicNumber:Color.kt$0xFF3D8FD4</ID>
+    <ID>MagicNumber:Color.kt$0xFF505050</ID>
+    <ID>MagicNumber:Color.kt$0xFF5BA85E</ID>
     <ID>MagicNumber:Color.kt$0xFF7C4DFF</ID>
     <ID>MagicNumber:Color.kt$0xFF9E9E9E</ID>
     <ID>MagicNumber:Color.kt$0xFFA5D6A7</ID>
-    <ID>MagicNumber:Color.kt$0xFFEF5350</ID>
+    <ID>MagicNumber:Color.kt$0xFFD4635F</ID>
+    <ID>MagicNumber:Color.kt$0xFFD9882A</ID>
     <ID>MagicNumber:Color.kt$0xFFEF9A9A</ID>
-    <ID>MagicNumber:Color.kt$0xFFFF9800</ID>
     <ID>MagicNumber:Color.kt$0xFFFFCC80</ID>
     <ID>MagicNumber:Color.kt$0xFFFFFFFF</ID>
     <ID>MagicNumber:CsvHandler.kt$4</ID>
@@ -93,14 +94,13 @@
     <ID>MagicNumber:LifetimeScreen.kt$6</ID>
     <ID>MagicNumber:LifetimeViewModel.kt$LifetimeViewModel$5000</ID>
     <ID>MagicNumber:Theme.kt$0xFF121212</ID>
-    <ID>MagicNumber:Theme.kt$0xFF1E1E1E</ID>
+    <ID>MagicNumber:Theme.kt$0xFF181818</ID>
     <ID>MagicNumber:Theme.kt$0xFFE0E0E0</ID>
     <ID>MatchingDeclarationName:AppNavigation.kt$Screen</ID>
     <ID>MatchingDeclarationName:BudgetScreen.kt$BudgetColumn</ID>
     <ID>MaxLineLength:AddEditBalanceDialog.kt$onConfirm(Balance(id = initial?.id ?: 0, name = name.trim(), reliability = reliability, amount = amount))</ID>
-    <ID>MaxLineLength:BalancesScreen.kt$.</ID>
-    <ID>MaxLineLength:BudgetScreen.kt$.</ID>
     <ID>MaxLineLength:BudgetScreen.kt$Text(item.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f).clickable(onClick = onNameClick))</ID>
+    <ID>MaxLineLength:BudgetScreen.kt$drawRect(color = WorstOrange, topLeft = Offset(size.width / 2, 0f), size = Size(size.width / 2, size.height))</ID>
     <ID>MaxLineLength:DemoMode.kt$fun isDemoMode(context: Context): Boolean</ID>
     <ID>MaxLineLength:HelpScreen.kt$"Tap an amount to quick-edit it. Tap item name to edit or delete. Sort by a-z, avg, or last; tap again to reverse."</ID>
     <ID>MaxLineLength:HelpScreen.kt$Text(" \u2014 $description", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)</ID>
