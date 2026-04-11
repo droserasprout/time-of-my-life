@@ -8,9 +8,9 @@ All data is stored locally. No network access, no accounts. Make backups!
 
 <table>
   <tr>
+    <td><img src="screen1.png" width="250"/></td>
     <td><img src="screen2.png" width="250"/></td>
     <td><img src="screen3.png" width="250"/></td>
-    <td><img src="screen4.png" width="250"/></td>
   </tr>
 </table>
 
