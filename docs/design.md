@@ -94,7 +94,7 @@ All styles from `MaterialTheme.typography` (Material 3 defaults):
 
 ### AppDialog (shared shell)
 
-- `Dialog` → `Card(shape = RoundedCornerShape(DialogCornerRadius))` → `Column(padding = 24dp, spacedBy = 12dp)`
+- Dialog → Card(DialogCornerRadius) → Column(24dp, spacedBy 12dp)
 - Used by AddEditBalanceDialog and AddEditBudgetItemDialog
 - QuickEditDialog uses custom padding (16dp/12dp), not AppDialog
 
@@ -113,7 +113,8 @@ All styles from `MaterialTheme.typography` (Material 3 defaults):
 
 - Track: 44x24dp pill, RoundedCornerShape(trackHeight/2)
 - Thumb: 18dp circle, animates position
-- On: primary track + onPrimary thumb; Off: primaryContainer track + SubduedText thumb
+- On: primary track + onPrimary thumb
+- Off: primaryContainer track + SubduedText thumb
 
 ### QuickEditDialog
 
@@ -166,7 +167,7 @@ Box(fillMaxSize)
   Column(fillMaxSize)
     TotalsCard (padding: top=innerPadding+4, start/end=16)
       Column (padding: h=12, v=10)
-        TickBar: height=14+4 overhang, fullWidth, blue/orange bg, white rounded tick
+        TickBar: height=14+4, fullWidth, blue/orange bg, white tick
         Spacer(8)
         Header row: "best"/"last"/"worst" (64dp each), labelSmall
         TotalsRow x3: Expenses/Income/Net, bodyMedium + bodySmall
@@ -302,8 +303,8 @@ Column headers use lowercase; everything else uses sentence case.
 | Item card elevation | 1dp tonal (via ItemCard) |
 | Item card padding | start=16, end=12, top=7, bottom=7 (via ItemCard) |
 | Section headers | labelMedium, primary color (all screens) |
-| Subdued column headers | SubduedText (#99E0E0E0) |
-| Dialog content padding | 24dp via AppDialog (full edit), 16x12dp (quick edit) |
+| Subdued column headers | SubduedText |
+| Dialog padding | 24dp (AppDialog), 16x12dp (quick edit) |
 | FAB | via AddFab: SmallFloatingActionButton, shapes.medium |
 | Totals panel padding | horizontal=12, vertical=10 |
 | Overlay screen padding | h=24-32dp (wider for readability) |
