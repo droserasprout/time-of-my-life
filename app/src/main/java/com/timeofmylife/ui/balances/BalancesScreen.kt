@@ -135,8 +135,9 @@ fun BalancesScreen(
             }
         }
 
-        FloatingActionButton(
+        SmallFloatingActionButton(
             onClick = { showAddDialog = true },
+            shape = MaterialTheme.shapes.medium,
             modifier =
                 Modifier
                     .align(Alignment.BottomEnd)

@@ -19,7 +19,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.timeofmylife.ui.theme.Accent
 import com.timeofmylife.ui.theme.AccentContainer
-import com.timeofmylife.ui.theme.DialogCornerRadius
 import com.timeofmylife.ui.theme.NavBarHeight
 
 @Composable
@@ -30,7 +29,7 @@ fun SlidingNavBar(
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
-    val cornerRadiusPx = with(density) { DialogCornerRadius.toPx() }
+    val cornerRadiusPx = with(density) { 8.dp.toPx() }
     val horizontalInsetPx = with(density) { 8.dp.toPx() }
     val verticalInsetPx = with(density) { 6.dp.toPx() }
     var totalWidthPx by remember { mutableIntStateOf(0) }
